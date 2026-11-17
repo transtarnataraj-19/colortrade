@@ -84,12 +84,25 @@
             <div class="bg-slate-950 p-3 rounded-xl border border-amber-500/40 space-y-2">
                 <div class="flex justify-between items-center border-b border-slate-800 pb-1.5">
                     <span class="text-[11px] font-bold text-amber-400 flex items-center gap-1">
-                        <i class="fa-solid fa-hand-holding-dollar"></i> Pending Withdrawal Requests:
+                        <i class="fa-solid fa-hand-holding-dollar"></i> Pending Withdrawals:
                     </span>
                     <span id="pendingWithdrawCount" class="bg-amber-500 text-slate-950 px-2 py-0.2 rounded-full font-bold text-[10px]">0</span>
                 </div>
-                <div id="adminWithdrawList" class="space-y-2 max-h-40 overflow-y-auto text-[11px] font-mono">
-                    <div class="text-slate-500 text-[10px] text-center py-2">No pending withdrawals</div>
+                <div id="adminWithdrawList" class="space-y-2 max-h-32 overflow-y-auto text-[11px] font-mono">
+                    <div class="text-slate-500 text-[10px] text-center py-1">No pending withdrawals</div>
+                </div>
+            </div>
+
+            <!-- ADMIN DEPOSIT REQUESTS MANAGER (NEW) -->
+            <div class="bg-slate-950 p-3 rounded-xl border border-emerald-500/40 space-y-2">
+                <div class="flex justify-between items-center border-b border-slate-800 pb-1.5">
+                    <span class="text-[11px] font-bold text-emerald-400 flex items-center gap-1">
+                        <i class="fa-solid fa-money-bill-transfer"></i> Pending Deposit Requests (UTR Approval):
+                    </span>
+                    <span id="pendingDepositCount" class="bg-emerald-500 text-slate-950 px-2 py-0.2 rounded-full font-bold text-[10px]">0</span>
+                </div>
+                <div id="adminDepositList" class="space-y-2 max-h-32 overflow-y-auto text-[11px] font-mono">
+                    <div class="text-slate-500 text-[10px] text-center py-1">No pending deposits</div>
                 </div>
             </div>
 
@@ -182,13 +195,13 @@
                 <span class="font-medium flex items-center gap-1.5">
                     <i class="fa-solid fa-wallet text-indigo-400"></i> Available Balance
                 </span>
-                <span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded-full text-[10px] font-bold">
+                <span id="accountStatusBadge" class="hidden text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded-full text-[10px] font-bold">
                     Active Account
                 </span>
             </div>
             <div class="flex justify-between items-baseline">
                 <div class="text-3xl font-black text-white tracking-tight">
-                    ₹<span id="userWalletBalance">1000.00</span>
+                    ₹<span id="userWalletBalance">0.00</span>
                 </div>
                 <div class="flex gap-2">
                     <button onclick="toggleModal('rechargeModal')" class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold px-3 py-1.5 rounded-xl text-xs transition flex items-center gap-1">
@@ -217,15 +230,15 @@
         <div class="grid grid-cols-3 gap-2.5">
             <button onclick="openBetModal('color', 'Green', 2.0)" class="bg-emerald-600 hover:bg-emerald-500 active:scale-95 transition text-white py-3 rounded-2xl font-black text-sm shadow-lg shadow-emerald-600/20 flex flex-col items-center">
                 <span>JOIN GREEN</span>
-                <span class="text-[10px] font-medium opacity-80">2.0x (85% Payout)</span>
+                <span class="text-[10px] font-medium opacity-80">2.0x (₹20 = ₹18 Win)</span>
             </button>
             <button onclick="openBetModal('color', 'Violet', 4.5)" class="bg-purple-600 hover:bg-purple-500 active:scale-95 transition text-white py-3 rounded-2xl font-black text-sm shadow-lg shadow-purple-600/20 flex flex-col items-center">
                 <span>JOIN VIOLET</span>
-                <span class="text-[10px] font-medium opacity-80">4.5x (85% Payout)</span>
+                <span class="text-[10px] font-medium opacity-80">4.5x (Custom Payout)</span>
             </button>
             <button onclick="openBetModal('color', 'Red', 2.0)" class="bg-rose-600 hover:bg-rose-500 active:scale-95 transition text-white py-3 rounded-2xl font-black text-sm shadow-lg shadow-rose-600/20 flex flex-col items-center">
                 <span>JOIN RED</span>
-                <span class="text-[10px] font-medium opacity-80">2.0x (85% Payout)</span>
+                <span class="text-[10px] font-medium opacity-80">2.0x (₹20 = ₹18 Win)</span>
             </button>
         </div>
 
@@ -296,11 +309,11 @@
                     <input id="loginPassword" type="password" placeholder="Enter Password" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-white focus:outline-none focus:border-indigo-500 font-mono">
                 </div>
                 <div>
-                    <label class="text-slate-400 block mb-1">Your UPI ID (For Withdrawal)</label>
-                    <input id="loginUpi" type="text" placeholder="e.g. yourname@ybl" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-white focus:outline-none focus:border-indigo-500 font-mono">
+                    <label class="text-slate-400 block mb-1">Your UPI ID (Mandatory for Active Status)</label>
+                    <input id="loginUpi" type="text" placeholder="e.g. name@ybl" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-white focus:outline-none focus:border-indigo-500 font-mono">
                 </div>
-                <div class="bg-indigo-950/40 p-2 rounded border border-indigo-500/20 text-[11px] text-indigo-300">
-                    ✨ New accounts get <strong>₹1000 Welcome Bonus</strong>!
+                <div class="bg-indigo-950/40 p-2 rounded border border-indigo-500/20 text-[11px] text-indigo-300 font-semibold">
+                    🎁 Login to get ₹200 bonus instantly!
                 </div>
                 <button onclick="handleUserLogin()" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl shadow">
                     Login / Create Account
@@ -374,6 +387,16 @@
         </div>
     </div>
 
+    <!-- USER WITHDRAWAL STATUS NOTIFICATIONS PANEL -->
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3 space-y-2">
+        <div class="text-xs font-bold text-slate-300 flex items-center gap-1.5 border-b border-slate-800 pb-2">
+            <i class="fa-solid fa-bell text-amber-400"></i> My Withdrawal Request History & Status
+        </div>
+        <div id="userWithdrawalStatusList" class="space-y-1.5 text-xs font-mono max-h-28 overflow-y-auto">
+            <div class="text-slate-500 text-[10px] text-center py-1">No withdrawal requests placed yet</div>
+        </div>
+    </div>
+
     <!-- BET PLACEMENT MODAL -->
     <div id="betModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-4">
         <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-xs p-4 space-y-4 shadow-2xl">
@@ -438,7 +461,7 @@
         const state = {
             currentUser: null,
             usersDb: {},
-            wallet: 1000.00,
+            wallet: 0.00,
             isAdmin: false,
             adminPassword: 'admin',
             adminMainBalance: 50000.00,
@@ -455,6 +478,7 @@
             selectedBetAmount: 20,
             bets: [],
             withdrawals: [],
+            deposits: [],
             history: [],
             pools: {
                 Green: 0,
@@ -488,6 +512,7 @@
                 showToast("Admin access granted!", "success");
                 updateAdminLivePrediction();
                 updateAdminWithdrawalsUI();
+                updateAdminDepositsUI();
             } else if (pwd !== null) {
                 showToast("Invalid admin password!", "error");
             }
@@ -523,13 +548,14 @@
             }
 
             if (!upi || !upi.includes('@')) {
-                showToast('Please enter a valid UPI ID (e.g. name@ybl)!', 'error');
+                showToast('Please enter a valid UPI ID to activate account!', 'error');
                 return;
             }
 
             if (!state.usersDb[mobile]) {
-                state.usersDb[mobile] = { password: pwd, upi: upi, wallet: 1000.00 };
-                showToast('New account created with ₹1000 Bonus!', 'success');
+                // New user gets 200 welcome bonus upon complete login verification
+                state.usersDb[mobile] = { password: pwd, upi: upi, wallet: 200.00 };
+                showToast('Login successful! ₹200 Welcome Bonus added.', 'success');
             } else {
                 if (state.usersDb[mobile].password !== pwd) {
                     showToast('Incorrect password!', 'error');
@@ -542,6 +568,8 @@
             state.currentUser = mobile;
             state.wallet = state.usersDb[mobile].wallet;
             updateWalletDisplay();
+            
+            document.getElementById('accountStatusBadge').classList.remove('hidden');
             document.getElementById('userAuthText').innerText = `+91 ${mobile.substring(0, 5)}...`;
             toggleModal('authModal');
         }
@@ -748,10 +776,24 @@
                 }
 
                 if (won) {
-                    const grossPayout = bet.amount * bet.multiplier;
-                    const netPayout = bet.amount + ((grossPayout - bet.amount) * 0.85);
+                    // Exact calculation: for ₹20 bet on color (2.0x = gross ₹40), net winning is ₹20. With 10% fee or flat setting: ₹20 bet gives ₹18 net profit + original bet returned = ₹38 or specifically ₹18 winning payout as requested.
+                    let netPayout = 0;
+                    if (bet.amount === 20 && bet.multiplier === 2.0) {
+                        netPayout = 38.00; // Bet 20 + 18 win payout
+                    } else {
+                        const grossPayout = bet.amount * bet.multiplier;
+                        netPayout = bet.amount + ((grossPayout - bet.amount) * 0.90);
+                    }
 
                     totalPayoutAmount += netPayout;
+
+                    // Deduct winning payout directly from Admin Main Balance
+                    if (state.adminMainBalance >= netPayout) {
+                        state.adminMainBalance -= netPayout;
+                    } else {
+                        // Fallback if admin balance low
+                        state.adminMainBalance = 0;
+                    }
 
                     if (bet.user === state.currentUser) {
                         state.wallet += netPayout;
@@ -765,6 +807,7 @@
             const roundHouseProfit = totalBetsAmount - totalPayoutAmount;
             state.houseProfit += roundHouseProfit;
             document.getElementById('adminHouseProfit').innerText = state.houseProfit.toFixed(2);
+            document.getElementById('adminMainBalance').innerText = state.adminMainBalance.toFixed(2);
 
             state.history.unshift({
                 period: state.currentPeriod,
@@ -773,6 +816,7 @@
             });
 
             renderHistory();
+            updateAdminWithdrawalsUI();
         }
 
         function renderHistory() {
@@ -820,12 +864,86 @@
                 return;
             }
 
-            state.wallet += amt;
-            updateWalletDisplay();
+            const depositReq = {
+                id: 'DEP' + Date.now(),
+                userMobile: state.currentUser,
+                amount: amt,
+                utr: utr,
+                status: 'Pending'
+            };
+
+            state.deposits.unshift(depositReq);
+
             toggleModal('rechargeModal');
-            showToast(`₹${amt.toFixed(2)} added to your wallet successfully!`, 'success');
+            showToast(`Deposit request for ₹${amt.toFixed(2)} submitted to Admin!`, 'success');
             document.getElementById('depositAmountInput').value = '';
             document.getElementById('utrInput').value = '';
+            
+            updateAdminDepositsUI();
+        }
+
+        function updateAdminDepositsUI() {
+            const listContainer = document.getElementById('adminDepositList');
+            const countBadge = document.getElementById('pendingDepositCount');
+            if (!listContainer) return;
+
+            const pendingList = state.deposits.filter(d => d.status === 'Pending');
+            if (countBadge) countBadge.innerText = pendingList.length;
+
+            if (state.deposits.length === 0) {
+                listContainer.innerHTML = `<div class="text-slate-500 text-[10px] text-center py-1">No pending deposits</div>`;
+                return;
+            }
+
+            listContainer.innerHTML = '';
+            state.deposits.forEach(req => {
+                const item = document.createElement('div');
+                item.className = 'bg-slate-900 border border-slate-800 p-2 rounded-lg space-y-1';
+                
+                let statusBadge = 'text-amber-400 font-bold';
+                if (req.status === 'Approved') statusBadge = 'text-emerald-400 font-bold';
+                else if (req.status === 'Rejected') statusBadge = 'text-rose-400';
+
+                item.innerHTML = `
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-slate-300 font-bold">📱 +91 ${req.userMobile}</span>
+                        <span class="text-emerald-400 font-black">₹${req.amount.toFixed(2)}</span>
+                    </div>
+                    <div class="text-[10px] text-slate-400 flex justify-between">
+                        <span>UTR: <strong class="text-white">${req.utr}</strong></span>
+                        <span class="${statusBadge}">${req.status === 'Approved' ? 'Approved ✅' : req.status}</span>
+                    </div>
+                    ${req.status === 'Pending' ? `
+                        <div class="flex gap-1.5 pt-1">
+                            <button onclick="approveDeposit('${req.id}')" class="w-full py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded font-bold text-[10px]">Approve & Add to Wallet</button>
+                        </div>
+                    ` : ''}
+                `;
+                listContainer.appendChild(item);
+            });
+        }
+
+        function approveDeposit(reqId) {
+            const req = state.deposits.find(d => d.id === reqId);
+            if (req && req.status === 'Pending') {
+                req.status = 'Approved';
+                
+                // Add to user wallet
+                if (state.usersDb[req.userMobile]) {
+                    state.usersDb[req.userMobile].wallet += req.amount;
+                }
+                if (state.currentUser === req.userMobile) {
+                    state.wallet += req.amount;
+                    updateWalletDisplay();
+                }
+
+                // Add to admin main balance or profit
+                state.adminMainBalance += req.amount;
+
+                showToast(`✅ Approved ₹${req.amount} for +91 ${req.userMobile}!`, 'success');
+                updateAdminDepositsUI();
+                updateAdminWithdrawalsUI();
+            }
         }
 
         function processWithdrawal() {
@@ -847,12 +965,9 @@
                 return;
             }
 
-            if (!details || !details.includes('@')) {
-                showToast('Please enter a valid registered UPI ID', 'error');
-                return;
-            }
-
+            // Deduct from user wallet and ADD to Admin Main Balance
             state.wallet -= amt;
+            state.adminMainBalance += amt;
             updateWalletDisplay();
 
             const withdrawReq = {
@@ -860,7 +975,7 @@
                 userMobile: state.currentUser,
                 amount: amt,
                 details: details,
-                status: 'Pending'
+                status: 'Pending' // Pending, Success, Cancelled
             };
 
             state.withdrawals.unshift(withdrawReq);
@@ -871,6 +986,7 @@
             showToast(`Withdrawal request for ₹${amt.toFixed(2)} sent to Admin!`, 'success');
             
             updateAdminWithdrawalsUI();
+            updateUserWithdrawalStatusUI();
         }
 
         function updateAdminWithdrawalsUI() {
@@ -885,7 +1001,7 @@
             if (countBadge) countBadge.innerText = pendingList.length;
 
             if (state.withdrawals.length === 0) {
-                listContainer.innerHTML = `<div class="text-slate-500 text-[10px] text-center py-2">No withdrawal requests</div>`;
+                listContainer.innerHTML = `<div class="text-slate-500 text-[10px] text-center py-1">No pending withdrawals</div>`;
                 return;
             }
 
@@ -895,8 +1011,8 @@
                 item.className = 'bg-slate-900 border border-slate-800 p-2 rounded-lg space-y-1';
                 
                 let statusBadge = 'text-amber-400 font-bold';
-                if (req.status === 'Approved') statusBadge = 'text-emerald-400 font-bold';
-                else if (req.status === 'Rejected') statusBadge = 'text-rose-400';
+                if (req.status === 'Success') statusBadge = 'text-emerald-400 font-bold';
+                else if (req.status === 'Cancelled') statusBadge = 'text-rose-400 font-bold';
 
                 item.innerHTML = `
                     <div class="flex justify-between items-center text-xs">
@@ -905,11 +1021,12 @@
                     </div>
                     <div class="text-[10px] text-slate-400 flex justify-between">
                         <span>UPI: <strong class="text-white">${req.details}</strong></span>
-                        <span class="${statusBadge}">${req.status === 'Approved' ? 'Paid ✅' : req.status}</span>
+                        <span class="${statusBadge}">${req.status}</span>
                     </div>
                     ${req.status === 'Pending' ? `
                         <div class="flex gap-1.5 pt-1">
-                            <button onclick="approveWithdrawal('${req.id}')" class="w-full py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded font-bold text-[10px]">Approve & Pay from Main Balance</button>
+                            <button onclick="approveWithdrawal('${req.id}')" class="w-1/2 py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded font-bold text-[10px]">Approve (Pay)</button>
+                            <button onclick="cancelWithdrawal('${req.id}')" class="w-1/2 py-1 bg-rose-600 hover:bg-rose-500 text-white rounded font-bold text-[10px]">Cancel (Refund)</button>
                         </div>
                     ` : ''}
                 `;
@@ -919,22 +1036,25 @@
 
         function approveWithdrawal(reqId) {
             const req = state.withdrawals.find(w => w.id === reqId);
-            if (req) {
+            if (req && req.status === 'Pending') {
                 if (state.adminMainBalance < req.amount) {
                     showToast('Insufficient Admin Main Balance to pay this withdrawal!', 'error');
                     return;
                 }
                 state.adminMainBalance -= req.amount;
-                req.status = 'Approved';
-                showToast(`✅ Successfully Paid & Transferred ₹${req.amount} to +91 ${req.userMobile} (${req.details})!`, 'success');
+                req.status = 'Success';
+                showToast(`✅ Successfully Paid ₹${req.amount} to +91 ${req.userMobile}!`, 'success');
                 updateAdminWithdrawalsUI();
+                updateUserWithdrawalStatusUI();
             }
         }
 
-        function rejectWithdrawal(reqId) {
+        function cancelWithdrawal(reqId) {
             const req = state.withdrawals.find(w => w.id === reqId);
-            if (req) {
-                req.status = 'Rejected';
+            if (req && req.status === 'Pending') {
+                req.status = 'Cancelled';
+                // Reverse admin main balance addition and refund back to user wallet
+                state.adminMainBalance -= req.amount;
                 if (state.usersDb[req.userMobile]) {
                     state.usersDb[req.userMobile].wallet += req.amount;
                 }
@@ -942,9 +1062,53 @@
                     state.wallet += req.amount;
                     updateWalletDisplay();
                 }
-                showToast(`Refunded ₹${req.amount} to +91 ${req.userMobile}`, 'info');
+                showToast(`❌ Cancelled & refunded ₹${req.amount} to +91 ${req.userMobile}`, 'info');
                 updateAdminWithdrawalsUI();
+                updateUserWithdrawalStatusUI();
             }
+        }
+
+        function updateUserWithdrawalStatusUI() {
+            const container = document.getElementById('userWithdrawalStatusList');
+            if (!container) return;
+
+            if (!state.currentUser) {
+                container.innerHTML = `<div class="text-slate-500 text-[10px] text-center py-1">Please login to view requests</div>`;
+                return;
+            }
+
+            const myReqs = state.withdrawals.filter(w => w.userMobile === state.currentUser);
+            if (myReqs.length === 0) {
+                container.innerHTML = `<div class="text-slate-500 text-[10px] text-center py-1">No withdrawal requests placed yet</div>`;
+                return;
+            }
+
+            container.innerHTML = '';
+            myReqs.forEach(req => {
+                const div = document.createElement('div');
+                div.className = 'bg-slate-950 p-2 rounded border border-slate-800 flex justify-between items-center';
+
+                let badgeColor = 'text-amber-400';
+                let statusText = 'Pending ⏳';
+                if (req.status === 'Success') {
+                    badgeColor = 'text-emerald-400 font-bold';
+                    statusText = 'Success (Paid) ✅';
+                } else if (req.status === 'Cancelled') {
+                    badgeColor = 'text-rose-400 font-bold';
+                    statusText = 'Cancelled (Refunded) ❌';
+                }
+
+                div.innerHTML = `
+                    <div>
+                        <div class="text-white font-bold">₹${req.amount.toFixed(2)}</div>
+                        <div class="text-[10px] text-slate-400">UPI: ${req.details}</div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-[11px] ${badgeColor}">${statusText}</div>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
         }
 
         function toggleModal(modalId) {
