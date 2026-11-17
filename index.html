@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ColorTrade Pro - Official Gaming Platform</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            touch-action: manipulation;
+        }
+        .animate-pulse-slow {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen pb-20 select-none" oncontextmenu="return false;">
+
+    <!-- Header Navigation -->
+    <header class="bg-slate-900/90 backdrop-blur border-b border-slate-800 sticky top-0 z-40 px-4 py-3">
+        <div class="max-w-md mx-auto flex justify-between items-center">
+            <!-- Brand Logo with Secret Admin Triple Click -->
+            <div id="brandLogo" onclick="handleSecretAdminClick()" class="cursor-pointer flex items-center gap-2">
+                <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-emerald-500 via-indigo-500 to-rose-500 flex items-center justify-center font-black text-white text-sm shadow-lg shadow-indigo-500/20">
+                    C
+                </div>
+                <span class="font-extrabold text-base bg-gradient-to-r from-emerald-400 to-indigo-400 bg-clip-text text-transparent">
+                    ColorTrade Pro
+                </span>
+            </div>
+
+            <!-- User Auth Status & Wallet -->
+            <div class="flex items-center gap-2">
+                <div id="adminActiveBtn" class="hidden text-[10px] bg-amber-500/20 border border-amber-500/40 text-amber-400 px-2 py-0.5 rounded font-bold">
+                    ADMIN ACTIVE
+                </div>
+                <button id="userAuthBtn" onclick="toggleModal('authModal')" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 px-2.5 py-1 rounded-lg flex items-center gap-1 font-semibold">
+                    <i class="fa-solid fa-user-circle"></i> <span id="userAuthText">Login</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-md mx-auto p-4 space-y-4">
+
+        <!-- Hidden Admin Control Panel (Owner Dashboard) -->
+        <div id="adminPanel" class="hidden bg-slate-900 border-2 border-amber-500/40 p-4 rounded-2xl space-y-3 shadow-2xl">
+            <div class="flex justify-between items-center text-xs border-b border-slate-800 pb-2">
+                <span class="font-bold text-amber-400 flex items-center gap-1.5">
+                    <i class="fa-solid fa-user-shield"></i> Owner Admin Dashboard
+                </span>
+                <button onclick="logoutAdmin()" class="text-[10px] bg-rose-500/20 text-rose-400 px-2 py-0.5 rounded hover:bg-rose-500/30">Logout Admin</button>
+            </div>
+
+            <!-- Admin Main Wallet Balance & House Profit -->
+            <div class="grid grid-cols-2 gap-2">
+                <div class="bg-indigo-950/60 p-3 rounded-xl border border-indigo-500/30">
+                    <div class="text-[10px] text-indigo-300 uppercase tracking-wider font-semibold">Admin Main Balance</div>
+                    <div class="text-lg font-black text-emerald-400 mt-0.5">₹<span id="adminMainBalance">50000.00</span></div>
+                </div>
+                <div class="bg-indigo-950/60 p-3 rounded-xl border border-indigo-500/30">
+                    <div class="text-[10px] text-indigo-300 uppercase tracking-wider font-semibold">Net Profit</div>
+                    <div class="text-lg font-black text-amber-400 mt-0.5">₹<span id="adminHouseProfit">0.00</span></div>
+                </div>
+            </div>
+
+            <!-- ADMIN WITHDRAWAL REQUESTS MANAGER -->
+            <div class="bg-slate-950 p-3 rounded-xl border border-amber-500/40 space-y-2">
+                <div class="flex justify-between items-center border-b border-slate-800 pb-1.5">
+                    <span class="text-[11px] font-bold text-amber-400 flex items-center gap-1">
+                        <i class="fa-solid fa-hand-holding-dollar"></i> Pending Withdrawal Requests:
+                    </span>
+                    <span id="pendingWithdrawCount" class="bg-amber-500 text-slate-950 px-2 py-0.2 rounded-full font-bold text-[10px]">0</span>
+                </div>
+                <div id="adminWithdrawList" class="space-y-2 max-h-40 overflow-y-auto text-[11px] font-mono">
+                    <div class="text-slate-500 text-[10px] text-center py-2">No pending withdrawals</div>
+                </div>
+            </div>
+
+            <!-- NEXT PREDICTED WINNING NUMBER (Admin Live View) -->
+            <div class="bg-amber-950/40 p-3 rounded-xl border border-amber-500/40 flex justify-between items-center">
+                <div>
+                    <div class="text-[10px] text-amber-400 font-bold uppercase tracking-wider">Next Winning Result (Live)</div>
+                    <div class="text-[11px] text-slate-400">Based on system logic/override</div>
+                </div>
+                <div class="text-right">
+                    <span id="adminPredictedOutcome" class="text-lg font-black px-3 py-1 rounded border border-emerald-500/50 bg-emerald-950 text-emerald-400">
+                        PREDICTING...
+                    </span>
+                </div>
+            </div>
+
+            <!-- LIVE BETTING POOLS STATS (Admin View) -->
+            <div class="bg-slate-950 p-3 rounded-xl border border-indigo-500/30 space-y-2">
+                <div class="text-[11px] font-bold text-indigo-400 flex items-center gap-1">
+                    <i class="fa-solid fa-chart-pie"></i> Current Round Bet Pools (Amount on each):
+                </div>
+                <div class="grid grid-cols-3 gap-1.5 text-[10px] font-mono">
+                    <div class="bg-emerald-950/60 p-1.5 rounded border border-emerald-500/30 text-center">
+                        <div class="text-emerald-400 font-bold">Green</div>
+                        <div class="text-white font-black" id="poolGreenAmt">₹0</div>
+                    </div>
+                    <div class="bg-purple-950/60 p-1.5 rounded border border-purple-500/30 text-center">
+                        <div class="text-purple-400 font-bold">Violet</div>
+                        <div class="text-white font-black" id="poolVioletAmt">₹0</div>
+                    </div>
+                    <div class="bg-rose-950/60 p-1.5 rounded border border-rose-500/30 text-center">
+                        <div class="text-rose-400 font-bold">Red</div>
+                        <div class="text-white font-black" id="poolRedAmt">₹0</div>
+                    </div>
+                </div>
+                <div class="text-[10px] text-slate-400 pt-1 font-bold">Numbers Pool (0-9):</div>
+                <div id="adminNumbersPoolGrid" class="grid grid-cols-5 gap-1 text-[10px] font-mono">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+
+            <!-- Mode Selection -->
+            <div class="space-y-1.5">
+                <div class="text-[11px] font-semibold text-slate-300">Winning Strategy:</div>
+                <div class="grid grid-cols-2 gap-2 text-xs">
+                    <button id="btnModeLowest" onclick="setAdminMode('LOWEST')" class="py-2 bg-indigo-600 text-white font-bold rounded-lg border border-indigo-400">
+                        House Rigged (Lowest Pool)
+                    </button>
+                    <button id="btnModeRandom" onclick="setAdminMode('RANDOM')" class="py-2 bg-slate-800 text-slate-400 font-semibold rounded-lg">
+                        Pure Random
+                    </button>
+                </div>
+            </div>
+
+            <!-- Direct Result Overrides (Colors) -->
+            <div class="space-y-1.5 pt-1">
+                <div class="text-[11px] font-semibold text-slate-300">Direct Color Override:</div>
+                <div class="grid grid-cols-4 gap-1.5 text-[11px]">
+                    <button onclick="setResultOverride('AUTO')" class="py-1.5 bg-slate-800 text-slate-300 rounded font-bold">AUTO</button>
+                    <button onclick="setResultOverride('Green')" class="py-1.5 bg-emerald-600 text-white rounded font-bold">GREEN</button>
+                    <button onclick="setResultOverride('Violet')" class="py-1.5 bg-purple-600 text-white rounded font-bold">VIOLET</button>
+                    <button onclick="setResultOverride('Red')" class="py-1.5 bg-rose-600 text-white rounded font-bold">RED</button>
+                </div>
+            </div>
+
+            <!-- Direct Number Selector (0 to 9) -->
+            <div class="space-y-1.5 pt-1 border-t border-slate-800">
+                <div class="text-[11px] font-semibold text-amber-300 flex justify-between">
+                    <span>Direct Number Override (0 to 9):</span>
+                    <span id="activeOverrideBadge" class="text-[10px] text-indigo-400">AUTO</span>
+                </div>
+                <div class="grid grid-cols-5 gap-1.5 text-xs">
+                    <button onclick="setNumberOverride(0)" class="py-1 bg-slate-800 hover:bg-indigo-600 rounded font-bold border border-purple-500/50 text-purple-300">0 (V/R)</button>
+                    <button onclick="setNumberOverride(1)" class="py-1 bg-slate-800 hover:bg-emerald-600 rounded font-bold border border-emerald-500/50 text-emerald-300">1 (G)</button>
+                    <button onclick="setNumberOverride(2)" class="py-1 bg-slate-800 hover:bg-rose-600 rounded font-bold border border-rose-500/50 text-rose-300">2 (R)</button>
+                    <button onclick="setNumberOverride(3)" class="py-1 bg-slate-800 hover:bg-emerald-600 rounded font-bold border border-emerald-500/50 text-emerald-300">3 (G)</button>
+                    <button onclick="setNumberOverride(4)" class="py-1 bg-slate-800 hover:bg-rose-600 rounded font-bold border border-rose-500/50 text-rose-300">4 (R)</button>
+                    <button onclick="setNumberOverride(5)" class="py-1 bg-slate-800 hover:bg-purple-600 rounded font-bold border border-purple-500/50 text-purple-300">5 (V/G)</button>
+                    <button onclick="setNumberOverride(6)" class="py-1 bg-slate-800 hover:bg-rose-600 rounded font-bold border border-rose-500/50 text-rose-300">6 (R)</button>
+                    <button onclick="setNumberOverride(7)" class="py-1 bg-slate-800 hover:bg-emerald-600 rounded font-bold border border-emerald-500/50 text-emerald-300">7 (G)</button>
+                    <button onclick="setNumberOverride(8)" class="py-1 bg-slate-800 hover:bg-rose-600 rounded font-bold border border-rose-500/50 text-rose-300">8 (R)</button>
+                    <button onclick="setNumberOverride(9)" class="py-1 bg-slate-800 hover:bg-emerald-600 rounded font-bold border border-emerald-500/50 text-emerald-300">9 (G)</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Balance Card -->
+        <div class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 border border-slate-800 p-4 rounded-2xl shadow-xl space-y-3">
+            <div class="flex justify-between items-center text-xs text-slate-400">
+                <span class="font-medium flex items-center gap-1.5">
+                    <i class="fa-solid fa-wallet text-indigo-400"></i> Available Balance
+                </span>
+                <span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded-full text-[10px] font-bold">
+                    Active Account
+                </span>
+            </div>
+            <div class="flex justify-between items-baseline">
+                <div class="text-3xl font-black text-white tracking-tight">
+                    ₹<span id="userWalletBalance">1000.00</span>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="toggleModal('rechargeModal')" class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold px-3 py-1.5 rounded-xl text-xs transition flex items-center gap-1">
+                        <i class="fa-solid fa-plus-circle"></i> Deposit
+                    </button>
+                    <button onclick="toggleModal('withdrawModal')" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-3 py-1.5 rounded-xl text-xs transition flex items-center gap-1">
+                        <i class="fa-solid fa-arrow-up-right-from-square"></i> Withdraw
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Period and Timer Bar -->
+        <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-2xl flex justify-between items-center shadow-lg">
+            <div>
+                <div class="text-[10px] text-slate-400 uppercase font-semibold">Period ID</div>
+                <div id="periodDisplay" class="text-sm font-bold font-mono text-indigo-400">20261105001</div>
+            </div>
+            <div class="text-right">
+                <div class="text-[10px] text-slate-400 uppercase font-semibold">Count Down</div>
+                <div id="timerDisplay" class="text-xl font-black font-mono text-emerald-400">00:30</div>
+            </div>
+        </div>
+
+        <!-- Color Selection Buttons -->
+        <div class="grid grid-cols-3 gap-2.5">
+            <button onclick="openBetModal('color', 'Green', 2.0)" class="bg-emerald-600 hover:bg-emerald-500 active:scale-95 transition text-white py-3 rounded-2xl font-black text-sm shadow-lg shadow-emerald-600/20 flex flex-col items-center">
+                <span>JOIN GREEN</span>
+                <span class="text-[10px] font-medium opacity-80">2.0x (85% Payout)</span>
+            </button>
+            <button onclick="openBetModal('color', 'Violet', 4.5)" class="bg-purple-600 hover:bg-purple-500 active:scale-95 transition text-white py-3 rounded-2xl font-black text-sm shadow-lg shadow-purple-600/20 flex flex-col items-center">
+                <span>JOIN VIOLET</span>
+                <span class="text-[10px] font-medium opacity-80">4.5x (85% Payout)</span>
+            </button>
+            <button onclick="openBetModal('color', 'Red', 2.0)" class="bg-rose-600 hover:bg-rose-500 active:scale-95 transition text-white py-3 rounded-2xl font-black text-sm shadow-lg shadow-rose-600/20 flex flex-col items-center">
+                <span>JOIN RED</span>
+                <span class="text-[10px] font-medium opacity-80">2.0x (85% Payout)</span>
+            </button>
+        </div>
+
+        <!-- Numbers Grid (0-9) -->
+        <div class="bg-slate-900 border border-slate-800 p-3 rounded-2xl space-y-2">
+            <div class="text-[11px] font-bold text-slate-400 flex justify-between items-center">
+                <span>SELECT NUMBER</span>
+                <span class="text-indigo-400 text-[10px]">Multiply 9.0x</span>
+            </div>
+            <div class="grid grid-cols-5 gap-2">
+                <button onclick="openBetModal('number', 0, 9.0)" class="bg-gradient-to-br from-purple-600 to-rose-600 hover:opacity-90 active:scale-95 py-2.5 rounded-xl font-black text-white text-base shadow">0</button>
+                <button onclick="openBetModal('number', 1, 9.0)" class="bg-emerald-600 hover:bg-emerald-500 active:scale-95 py-2.5 rounded-xl font-black text-white text-base shadow">1</button>
+                <button onclick="openBetModal('number', 2, 9.0)" class="bg-rose-600 hover:bg-rose-500 active:scale-95 py-2.5 rounded-xl font-black text-white text-base shadow">2</button>
+                <button onclick="openBetModal('number', 3, 9.0)" class="bg-emerald-600 hover:bg-emerald-500 active:scale-95 py-2.5 rounded-xl font-black text-white text-base shadow">3</button>
+                <button onclick="openBetModal('number', 4, 9.0)" class="bg-rose-600 hover:bg-rose-500 active:scale-95 py-2.5 rounded-xl font-black text-white text-base shadow">4</button>
+                <button onclick="openBetModal('number', 5, 9.0)" class="bg-gradient-to-br from-purple-600 to-emerald-600 hover:opacity-90 active:scale-95 py-2.5 rounded-xl font-black text-white text-base shadow">5</button>
+                <button onclick="openBetModal('number', 6, 9.0)" class="bg-rose-600 hover:bg-rose-500 active:scale-95 py-2.5 rounded-xl font-black text-white text-base shadow">6</button>
+                <button onclick="openBetModal('number', 7, 9.0)" class="bg-emerald-600 hover:bg-emerald-500 active:scale-95 py-2.5 rounded-xl font-black text-white text-base shadow">7</button>
+                <button onclick="openBetModal('number', 8, 9.0)" class="bg-rose-600 hover:bg-rose-500 active:scale-95 py-2.5 rounded-xl font-black text-white text-base shadow">8</button>
+                <button onclick="openBetModal('number', 9, 9.0)" class="bg-emerald-600 hover:bg-emerald-500 active:scale-95 py-2.5 rounded-xl font-black text-white text-base shadow">9</button>
+            </div>
+        </div>
+
+        <!-- Game History Section -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-lg">
+            <div class="bg-slate-800/50 p-3 border-b border-slate-800 flex justify-between items-center">
+                <span class="text-xs font-bold text-slate-300 flex items-center gap-1.5">
+                    <i class="fa-solid fa-clock-rotate-left text-indigo-400"></i> Period Record History
+                </span>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs font-mono">
+                    <thead class="bg-slate-950 text-slate-400 border-b border-slate-800">
+                        <tr>
+                            <th class="p-2.5">Period</th>
+                            <th class="p-2.5">Number</th>
+                            <th class="p-2.5 text-right">Result Color</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyTableBody" class="divide-y divide-slate-800/50">
+                        <tr>
+                            <td colspan="3" class="p-4 text-center text-slate-500">No round history yet</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- USER AUTH / LOGIN MODAL -->
+    <div id="authModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-xs p-4 space-y-3 shadow-2xl">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+                <h3 class="font-bold text-sm text-white flex items-center gap-1.5">
+                    <i class="fa-solid fa-user-lock text-indigo-400"></i> Player Login / Sign Up
+                </h3>
+                <button onclick="toggleModal('authModal')" class="text-slate-400 hover:text-white">✕</button>
+            </div>
+
+            <div class="space-y-2.5 text-xs">
+                <div>
+                    <label class="text-slate-400 block mb-1">Mobile Number (10 digits)</label>
+                    <input id="loginMobile" type="tel" placeholder="Enter Mobile Number" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-white focus:outline-none focus:border-indigo-500 font-mono">
+                </div>
+                <div>
+                    <label class="text-slate-400 block mb-1">Password</label>
+                    <input id="loginPassword" type="password" placeholder="Enter Password" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-white focus:outline-none focus:border-indigo-500 font-mono">
+                </div>
+                <div>
+                    <label class="text-slate-400 block mb-1">Your UPI ID (For Withdrawal)</label>
+                    <input id="loginUpi" type="text" placeholder="e.g. yourname@ybl" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-white focus:outline-none focus:border-indigo-500 font-mono">
+                </div>
+                <div class="bg-indigo-950/40 p-2 rounded border border-indigo-500/20 text-[11px] text-indigo-300">
+                    ✨ New accounts get <strong>₹1000 Welcome Bonus</strong>!
+                </div>
+                <button onclick="handleUserLogin()" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl shadow">
+                    Login / Create Account
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- RECHARGE / DEPOSIT MODAL -->
+    <div id="rechargeModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-xs p-4 space-y-3 shadow-2xl">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+                <h3 class="font-bold text-sm text-emerald-400 flex items-center gap-1.5">
+                    <i class="fa-solid fa-qrcode"></i> Deposit Money
+                </h3>
+                <button onclick="toggleModal('rechargeModal')" class="text-slate-400 hover:text-white">✕</button>
+            </div>
+
+            <div class="text-center space-y-2">
+                <div class="text-[11px] text-slate-400">Scan QR or Pay to Owner UPI</div>
+                <div class="bg-white p-2 rounded-xl inline-block border border-slate-700">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=upi://pay?pa=merchant@upi&pn=ColorTradePro" alt="UPI QR Code" class="w-32 h-32">
+                </div>
+                <div class="text-xs font-mono font-bold text-amber-400 bg-slate-950 p-1.5 rounded border border-slate-800">
+                    UPI: merchant@upi
+                </div>
+            </div>
+
+            <div class="space-y-2 text-xs pt-1">
+                <div>
+                    <label class="text-slate-400 block mb-1">Enter Paid Amount (₹)</label>
+                    <input id="depositAmountInput" type="number" placeholder="e.g. 500" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-white font-mono focus:outline-none focus:border-emerald-500">
+                </div>
+                <div>
+                    <label class="text-slate-400 block mb-1">Enter 12-Digit UTR / Ref Number</label>
+                    <input id="utrInput" type="text" placeholder="12-Digit Reference No." class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-white font-mono focus:outline-none focus:border-emerald-500">
+                </div>
+                <button onclick="processRecharge()" class="w-full py-2 bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-bold rounded-xl transition mt-2">
+                    Submit Payment & Add Balance
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- WITHDRAW MODAL -->
+    <div id="withdrawModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-xs p-4 space-y-3 shadow-2xl">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+                <h3 class="font-bold text-sm text-indigo-400 flex items-center gap-1.5">
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i> Request Withdrawal
+                </h3>
+                <button onclick="toggleModal('withdrawModal')" class="text-slate-400 hover:text-white">✕</button>
+            </div>
+
+            <div class="space-y-2 text-xs">
+                <div class="bg-amber-500/10 border border-amber-500/20 p-2 rounded text-[11px] text-amber-300">
+                    ⚠️ Minimum withdrawal: <strong>₹500.00</strong>
+                </div>
+                <div>
+                    <label class="text-slate-400 block mb-1">Withdraw Amount (Min ₹500)</label>
+                    <input id="withdrawAmountInput" type="number" min="500" placeholder="e.g. 500" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-white font-mono focus:outline-none focus:border-indigo-500">
+                </div>
+                <div>
+                    <label class="text-slate-400 block mb-1">Your Registered UPI ID</label>
+                    <input id="withdrawDetailsInput" type="text" placeholder="Your UPI ID" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-white font-mono focus:outline-none focus:border-indigo-500">
+                </div>
+                <button onclick="processWithdrawal()" class="w-full py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl transition mt-2">
+                    Submit Withdrawal Request
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- BET PLACEMENT MODAL -->
+    <div id="betModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-xs p-4 space-y-4 shadow-2xl">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+                <div>
+                    <h3 class="font-bold text-sm text-white">Confirm Bet</h3>
+                    <div id="betSelectionTitle" class="text-xs font-mono text-indigo-400">Green (2.0x)</div>
+                </div>
+                <button onclick="toggleModal('betModal')" class="text-slate-400 hover:text-white">✕</button>
+            </div>
+
+            <div class="space-y-3">
+                <div class="text-xs text-slate-400">Select Fixed Amount (₹):</div>
+                <div class="grid grid-cols-5 gap-1.5 font-mono text-[11px]">
+                    <button onclick="setBaseBetAmount(20)" class="py-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg font-bold">20</button>
+                    <button onclick="setBaseBetAmount(50)" class="py-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg font-bold">50</button>
+                    <button onclick="setBaseBetAmount(100)" class="py-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg font-bold">100</button>
+                    <button onclick="setBaseBetAmount(500)" class="py-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg font-bold">500</button>
+                    <button onclick="setBaseBetAmount(1000)" class="py-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg font-bold">1000</button>
+                </div>
+
+                <!-- Plus Minus Stepper (Incremental Addition) -->
+                <div class="flex items-center justify-between bg-slate-950 p-2 rounded-xl border border-slate-800">
+                    <span class="text-xs text-slate-400">Quantity / Multiplier:</span>
+                    <div class="flex items-center gap-2">
+                        <button onclick="adjustMultiplier(-1)" class="w-8 h-8 bg-slate-800 hover:bg-slate-700 text-white rounded-lg font-bold flex items-center justify-center">-</button>
+                        <span id="betMultiplierDisplay" class="font-mono font-bold text-sm text-indigo-400 w-6 text-center">1</span>
+                        <button onclick="adjustMultiplier(1)" class="w-8 h-8 bg-slate-800 hover:bg-slate-700 text-white rounded-lg font-bold flex items-center justify-center">+</button>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between border border-slate-800 p-2 rounded-xl bg-slate-950">
+                    <span class="text-xs text-slate-400">Total Bet Amount:</span>
+                    <span id="betAmountDisplay" class="text-lg font-black text-emerald-400 font-mono">₹20</span>
+                </div>
+
+                <button onclick="confirmBet()" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-black rounded-xl shadow-lg transition">
+                    CONFIRM BET
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-800 border border-slate-700 text-white px-4 py-2.5 rounded-xl text-xs font-semibold shadow-2xl z-50 flex items-center gap-2">
+        <i id="toastIcon" class="fa-solid fa-circle-info text-indigo-400"></i>
+        <span id="toastMessage">Notification message</span>
+    </div>
+
+    <!-- Secure Encrypted Game Logic -->
+    <script>
+        // Anti-Inspect & Security Hardening
+        document.addEventListener('keydown', function(e) {
+            if (e.keyCode === 123 || (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 67)) || (e.ctrlKey && e.keyCode === 85)) {
+                e.preventDefault();
+                showToast("Security Alert: Inspection is restricted!", "error");
+                return false;
+            }
+        });
+
+        // Global Secure Game State
+        const state = {
+            currentUser: null,
+            usersDb: {},
+            wallet: 1000.00,
+            isAdmin: false,
+            adminPassword: 'admin',
+            adminMainBalance: 50000.00,
+            adminMode: 'LOWEST',
+            forcedColorResult: null,
+            forcedNumberResult: null,
+            houseProfit: 0.00,
+            currentPeriod: 20261105001,
+            timerSeconds: 30,
+            timerInterval: null,
+            currentSelection: { type: null, value: null, multiplier: 2.0 },
+            baseBetAmount: 20,
+            betMultiplier: 1,
+            selectedBetAmount: 20,
+            bets: [],
+            withdrawals: [],
+            history: [],
+            pools: {
+                Green: 0,
+                Violet: 0,
+                Red: 0,
+                numbers: { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 }
+            }
+        };
+
+        let clickCount = 0;
+        let clickTimer = null;
+
+        function handleSecretAdminClick() {
+            clickCount++;
+            if (clickCount === 1) {
+                clickTimer = setTimeout(() => { clickCount = 0; }, 1000);
+            } else if (clickCount >= 3) {
+                clearTimeout(clickTimer);
+                clickCount = 0;
+                promptAdminPassword();
+            }
+        }
+
+        function promptAdminPassword() {
+            const pwd = prompt("Enter Admin Password:");
+            if (pwd === state.adminPassword) {
+                state.isAdmin = true;
+                document.getElementById('adminPanel').classList.remove('hidden');
+                const adminActiveBtn = document.getElementById('adminActiveBtn');
+                if (adminActiveBtn) adminActiveBtn.classList.remove('hidden');
+                showToast("Admin access granted!", "success");
+                updateAdminLivePrediction();
+                updateAdminWithdrawalsUI();
+            } else if (pwd !== null) {
+                showToast("Invalid admin password!", "error");
+            }
+        }
+
+        function logoutAdmin() {
+            state.isAdmin = false;
+            document.getElementById('adminPanel').classList.add('hidden');
+            const adminActiveBtn = document.getElementById('adminActiveBtn');
+            if (adminActiveBtn) adminActiveBtn.classList.add('hidden');
+            showToast('Admin logged out successfully!', 'info');
+        }
+
+        window.onload = function () {
+            startTimer();
+            updateWalletDisplay();
+            updateAdminLivePrediction();
+        };
+
+        function handleUserLogin() {
+            const mobile = document.getElementById('loginMobile').value.trim();
+            const pwd = document.getElementById('loginPassword').value.trim();
+            const upi = document.getElementById('loginUpi').value.trim();
+
+            if (!mobile || mobile.length !== 10 || isNaN(mobile)) {
+                showToast('Please enter a valid 10-digit mobile number!', 'error');
+                return;
+            }
+
+            if (!pwd || pwd.length < 4) {
+                showToast('Password must be at least 4 characters!', 'error');
+                return;
+            }
+
+            if (!upi || !upi.includes('@')) {
+                showToast('Please enter a valid UPI ID (e.g. name@ybl)!', 'error');
+                return;
+            }
+
+            if (!state.usersDb[mobile]) {
+                state.usersDb[mobile] = { password: pwd, upi: upi, wallet: 1000.00 };
+                showToast('New account created with ₹1000 Bonus!', 'success');
+            } else {
+                if (state.usersDb[mobile].password !== pwd) {
+                    showToast('Incorrect password!', 'error');
+                    return;
+                }
+                state.usersDb[mobile].upi = upi;
+                showToast('Login successful!', 'success');
+            }
+
+            state.currentUser = mobile;
+            state.wallet = state.usersDb[mobile].wallet;
+            updateWalletDisplay();
+            document.getElementById('userAuthText').innerText = `+91 ${mobile.substring(0, 5)}...`;
+            toggleModal('authModal');
+        }
+
+        function updateWalletDisplay() {
+            document.getElementById('userWalletBalance').innerText = state.wallet.toFixed(2);
+            if (state.currentUser && state.usersDb[state.currentUser]) {
+                state.usersDb[state.currentUser].wallet = state.wallet;
+            }
+        }
+
+        function startTimer() {
+            clearInterval(state.timerInterval);
+            state.timerSeconds = 30;
+
+            state.timerInterval = setInterval(() => {
+                state.timerSeconds--;
+                const formatted = state.timerSeconds < 10 ? `00:0${state.timerSeconds}` : `00:${state.timerSeconds}`;
+                document.getElementById('timerDisplay').innerText = formatted;
+
+                updateAdminLivePrediction();
+
+                if (state.timerSeconds <= 0) {
+                    resolveRound();
+                    state.currentPeriod++;
+                    document.getElementById('periodDisplay').innerText = state.currentPeriod;
+                    state.timerSeconds = 30;
+                    state.pools = {
+                        Green: 0,
+                        Violet: 0,
+                        Red: 0,
+                        numbers: { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 }
+                    };
+                    state.bets = [];
+                }
+            }, 1000);
+        }
+
+        function openBetModal(type, value, multiplier) {
+            state.currentSelection = { type, value, multiplier };
+            document.getElementById('betSelectionTitle').innerText = `${value} (${multiplier}x)`;
+            state.baseBetAmount = 20;
+            state.betMultiplier = 1;
+            updateBetCalculation();
+            toggleModal('betModal');
+        }
+
+        function setBaseBetAmount(amt) {
+            state.baseBetAmount = amt;
+            updateBetCalculation();
+        }
+
+        function adjustMultiplier(change) {
+            state.betMultiplier += change;
+            if (state.betMultiplier < 1) state.betMultiplier = 1;
+            if (state.betMultiplier > 50) state.betMultiplier = 50;
+            updateBetCalculation();
+        }
+
+        function updateBetCalculation() {
+            state.selectedBetAmount = state.baseBetAmount * state.betMultiplier;
+            document.getElementById('betMultiplierDisplay').innerText = state.betMultiplier;
+            document.getElementById('betAmountDisplay').innerText = `₹${state.selectedBetAmount}`;
+        }
+
+        function confirmBet() {
+            if (!state.currentUser) {
+                toggleModal('betModal');
+                toggleModal('authModal');
+                showToast('Please login first to place bets!', 'error');
+                return;
+            }
+
+            if (state.timerSeconds <= 5) {
+                showToast('Betting locked for current round!', 'error');
+                toggleModal('betModal');
+                return;
+            }
+
+            if (state.wallet < state.selectedBetAmount) {
+                showToast('Insufficient wallet balance!', 'error');
+                return;
+            }
+
+            state.wallet -= state.selectedBetAmount;
+            updateWalletDisplay();
+
+            if (state.currentSelection.type === 'color') {
+                state.pools[state.currentSelection.value] += state.selectedBetAmount;
+            } else {
+                state.pools.numbers[state.currentSelection.value] += state.selectedBetAmount;
+            }
+
+            state.bets.push({
+                user: state.currentUser,
+                type: state.currentSelection.type,
+                value: state.currentSelection.value,
+                multiplier: state.currentSelection.multiplier,
+                amount: state.selectedBetAmount
+            });
+
+            toggleModal('betModal');
+            showToast(`Bet placed on ${state.currentSelection.value} for ₹${state.selectedBetAmount}`, 'success');
+            updateAdminLivePrediction();
+        }
+
+        function setAdminMode(mode) {
+            state.adminMode = mode;
+            state.forcedColorResult = null;
+            state.forcedNumberResult = null;
+            document.getElementById('btnModeLowest').className = mode === 'LOWEST' ? 'py-2 bg-indigo-600 text-white font-bold rounded-lg border border-indigo-400' : 'py-2 bg-slate-800 text-slate-400 font-semibold rounded-lg';
+            document.getElementById('btnModeRandom').className = mode === 'RANDOM' ? 'py-2 bg-indigo-600 text-white font-bold rounded-lg border border-indigo-400' : 'py-2 bg-slate-800 text-slate-400 font-semibold rounded-lg';
+            document.getElementById('activeOverrideBadge').innerText = 'AUTO';
+            showToast(`Strategy changed to ${mode}`, 'info');
+            updateAdminLivePrediction();
+        }
+
+        function setResultOverride(color) {
+            state.forcedColorResult = color === 'AUTO' ? null : color;
+            state.forcedNumberResult = null;
+            document.getElementById('activeOverrideBadge').innerText = color;
+            showToast(`Color override: ${color}`, 'info');
+            updateAdminLivePrediction();
+        }
+
+        function setNumberOverride(num) {
+            state.forcedNumberResult = num;
+            document.getElementById('activeOverrideBadge').innerText = `Num #${num}`;
+            showToast(`Number override set to #${num}`, 'info');
+            updateAdminLivePrediction();
+        }
+
+        function calculateOutcome() {
+            let winNum = 0;
+            let winColor = 'Green';
+
+            if (state.forcedNumberResult !== null) {
+                winNum = state.forcedNumberResult;
+            } else if (state.forcedColorResult) {
+                if (state.forcedColorResult === 'Green') winNum = [1, 3, 7, 9][Math.floor(Math.random() * 4)];
+                else if (state.forcedColorResult === 'Red') winNum = [2, 4, 6, 8][Math.floor(Math.random() * 4)];
+                else winNum = [0, 5][Math.floor(Math.random() * 2)];
+            } else if (state.adminMode === 'LOWEST') {
+                let lowestNum = 0;
+                let minPool = Infinity;
+                for (let i = 0; i <= 9; i++) {
+                    const pool = state.pools.numbers[i];
+                    if (pool < minPool) {
+                        minPool = pool;
+                        lowestNum = i;
+                    }
+                }
+                winNum = lowestNum;
+            } else {
+                winNum = Math.floor(Math.random() * 10);
+            }
+
+            if (winNum === 0) winColor = 'Violet & Red';
+            else if (winNum === 5) winColor = 'Violet & Green';
+            else if ([1, 3, 7, 9].includes(winNum)) winColor = 'Green';
+            else winColor = 'Red';
+
+            return { number: winNum, color: winColor };
+        }
+
+        function updateAdminLivePrediction() {
+            if (!state.isAdmin) return;
+            const outcome = calculateOutcome();
+            const outcomeEl = document.getElementById('adminPredictedOutcome');
+            if (outcomeEl) {
+                outcomeEl.innerText = `#${outcome.number} (${outcome.color})`;
+            }
+
+            document.getElementById('poolGreenAmt').innerText = `₹${state.pools.Green}`;
+            document.getElementById('poolVioletAmt').innerText = `₹${state.pools.Violet}`;
+            document.getElementById('poolRedAmt').innerText = `₹${state.pools.Red}`;
+
+            const numGrid = document.getElementById('adminNumbersPoolGrid');
+            if (numGrid) {
+                numGrid.innerHTML = '';
+                for (let i = 0; i <= 9; i++) {
+                    const amt = state.pools.numbers[i];
+                    const div = document.createElement('div');
+                    div.className = 'bg-slate-900 p-1 rounded border border-slate-800 text-center';
+                    div.innerHTML = `<span class="text-amber-400">#${i}</span>: <span class="text-white">₹${amt}</span>`;
+                    numGrid.appendChild(div);
+                }
+            }
+        }
+
+        function resolveRound() {
+            const outcome = calculateOutcome();
+            let totalBetsAmount = 0;
+            let totalPayoutAmount = 0;
+
+            state.bets.forEach(bet => {
+                totalBetsAmount += bet.amount;
+                let won = false;
+
+                if (bet.type === 'number' && bet.value === outcome.number) {
+                    won = true;
+                } else if (bet.type === 'color') {
+                    if (outcome.color.includes(bet.value)) won = true;
+                }
+
+                if (won) {
+                    const grossPayout = bet.amount * bet.multiplier;
+                    const netPayout = bet.amount + ((grossPayout - bet.amount) * 0.85);
+
+                    totalPayoutAmount += netPayout;
+
+                    if (bet.user === state.currentUser) {
+                        state.wallet += netPayout;
+                        showToast(`🎉 You Won ₹${netPayout.toFixed(2)} on #${outcome.number}!`, 'success');
+                    }
+                }
+            });
+
+            updateWalletDisplay();
+
+            const roundHouseProfit = totalBetsAmount - totalPayoutAmount;
+            state.houseProfit += roundHouseProfit;
+            document.getElementById('adminHouseProfit').innerText = state.houseProfit.toFixed(2);
+
+            state.history.unshift({
+                period: state.currentPeriod,
+                number: outcome.number,
+                color: outcome.color
+            });
+
+            renderHistory();
+        }
+
+        function renderHistory() {
+            const tbody = document.getElementById('historyTableBody');
+            tbody.innerHTML = '';
+
+            state.history.slice(0, 10).forEach(row => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-800/40';
+
+                let colorBadge = 'bg-emerald-600 text-white';
+                if (row.color.includes('Red') && row.color.includes('Violet')) colorBadge = 'bg-gradient-to-r from-purple-600 to-rose-600 text-white';
+                else if (row.color.includes('Green') && row.color.includes('Violet')) colorBadge = 'bg-gradient-to-r from-purple-600 to-emerald-600 text-white';
+                else if (row.color.includes('Red')) colorBadge = 'bg-rose-600 text-white';
+
+                tr.innerHTML = `
+                    <td class="p-2.5 font-bold text-slate-300">${row.period}</td>
+                    <td class="p-2.5 font-black text-indigo-400 text-sm">${row.number}</td>
+                    <td class="p-2.5 text-right">
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold ${colorBadge}">${row.color}</span>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function processRecharge() {
+            const amt = parseFloat(document.getElementById('depositAmountInput').value);
+            const utr = document.getElementById('utrInput').value.trim();
+
+            if (!state.currentUser) {
+                toggleModal('rechargeModal');
+                toggleModal('authModal');
+                showToast('Please login to deposit money!', 'error');
+                return;
+            }
+
+            if (!amt || amt <= 0) {
+                showToast('Please enter a valid deposit amount!', 'error');
+                return;
+            }
+
+            if (!utr || utr.length < 6) {
+                showToast('Please enter a valid 12-digit UTR reference number!', 'error');
+                return;
+            }
+
+            state.wallet += amt;
+            updateWalletDisplay();
+            toggleModal('rechargeModal');
+            showToast(`₹${amt.toFixed(2)} added to your wallet successfully!`, 'success');
+            document.getElementById('depositAmountInput').value = '';
+            document.getElementById('utrInput').value = '';
+        }
+
+        function processWithdrawal() {
+            const amt = parseFloat(document.getElementById('withdrawAmountInput').value);
+            const details = document.getElementById('withdrawDetailsInput').value.trim();
+
+            if (!state.currentUser) {
+                showToast('Please login to request withdrawal!', 'error');
+                return;
+            }
+
+            if (!amt || amt < 500) {
+                showToast('Minimum withdrawal amount is ₹500!', 'error');
+                return;
+            }
+
+            if (amt > state.wallet) {
+                showToast('Insufficient wallet balance for withdrawal!', 'error');
+                return;
+            }
+
+            if (!details || !details.includes('@')) {
+                showToast('Please enter a valid registered UPI ID', 'error');
+                return;
+            }
+
+            state.wallet -= amt;
+            updateWalletDisplay();
+
+            const withdrawReq = {
+                id: 'WID' + Date.now(),
+                userMobile: state.currentUser,
+                amount: amt,
+                details: details,
+                status: 'Pending'
+            };
+
+            state.withdrawals.unshift(withdrawReq);
+
+            document.getElementById('withdrawAmountInput').value = '';
+            document.getElementById('withdrawDetailsInput').value = '';
+            toggleModal('withdrawModal');
+            showToast(`Withdrawal request for ₹${amt.toFixed(2)} sent to Admin!`, 'success');
+            
+            updateAdminWithdrawalsUI();
+        }
+
+        function updateAdminWithdrawalsUI() {
+            const listContainer = document.getElementById('adminWithdrawList');
+            const countBadge = document.getElementById('pendingWithdrawCount');
+            const adminBalanceEl = document.getElementById('adminMainBalance');
+            
+            if (adminBalanceEl) adminBalanceEl.innerText = state.adminMainBalance.toFixed(2);
+            if (!listContainer) return;
+
+            const pendingList = state.withdrawals.filter(w => w.status === 'Pending');
+            if (countBadge) countBadge.innerText = pendingList.length;
+
+            if (state.withdrawals.length === 0) {
+                listContainer.innerHTML = `<div class="text-slate-500 text-[10px] text-center py-2">No withdrawal requests</div>`;
+                return;
+            }
+
+            listContainer.innerHTML = '';
+            state.withdrawals.forEach(req => {
+                const item = document.createElement('div');
+                item.className = 'bg-slate-900 border border-slate-800 p-2 rounded-lg space-y-1';
+                
+                let statusBadge = 'text-amber-400 font-bold';
+                if (req.status === 'Approved') statusBadge = 'text-emerald-400 font-bold';
+                else if (req.status === 'Rejected') statusBadge = 'text-rose-400';
+
+                item.innerHTML = `
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-slate-300 font-bold">📱 +91 ${req.userMobile}</span>
+                        <span class="text-emerald-400 font-black">₹${req.amount.toFixed(2)}</span>
+                    </div>
+                    <div class="text-[10px] text-slate-400 flex justify-between">
+                        <span>UPI: <strong class="text-white">${req.details}</strong></span>
+                        <span class="${statusBadge}">${req.status === 'Approved' ? 'Paid ✅' : req.status}</span>
+                    </div>
+                    ${req.status === 'Pending' ? `
+                        <div class="flex gap-1.5 pt-1">
+                            <button onclick="approveWithdrawal('${req.id}')" class="w-full py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded font-bold text-[10px]">Approve & Pay from Main Balance</button>
+                        </div>
+                    ` : ''}
+                `;
+                listContainer.appendChild(item);
+            });
+        }
+
+        function approveWithdrawal(reqId) {
+            const req = state.withdrawals.find(w => w.id === reqId);
+            if (req) {
+                if (state.adminMainBalance < req.amount) {
+                    showToast('Insufficient Admin Main Balance to pay this withdrawal!', 'error');
+                    return;
+                }
+                state.adminMainBalance -= req.amount;
+                req.status = 'Approved';
+                showToast(`✅ Successfully Paid & Transferred ₹${req.amount} to +91 ${req.userMobile} (${req.details})!`, 'success');
+                updateAdminWithdrawalsUI();
+            }
+        }
+
+        function rejectWithdrawal(reqId) {
+            const req = state.withdrawals.find(w => w.id === reqId);
+            if (req) {
+                req.status = 'Rejected';
+                if (state.usersDb[req.userMobile]) {
+                    state.usersDb[req.userMobile].wallet += req.amount;
+                }
+                if (state.currentUser === req.userMobile) {
+                    state.wallet += req.amount;
+                    updateWalletDisplay();
+                }
+                showToast(`Refunded ₹${req.amount} to +91 ${req.userMobile}`, 'info');
+                updateAdminWithdrawalsUI();
+            }
+        }
+
+        function toggleModal(modalId) {
+            const el = document.getElementById(modalId);
+            if (el) el.classList.toggle('hidden');
+        }
+
+        function showToast(msg, type = 'info') {
+            const toast = document.getElementById('toast');
+            const icon = document.getElementById('toastIcon');
+            const text = document.getElementById('toastMessage');
+
+            text.innerText = msg;
+            if (type === 'success') icon.className = 'fa-solid fa-circle-check text-emerald-400';
+            else if (type === 'error') icon.className = 'fa-solid fa-circle-exclamation text-rose-400';
+            else icon.className = 'fa-solid fa-circle-info text-indigo-400';
+
+            toast.classList.remove('hidden');
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
