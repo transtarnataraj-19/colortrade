@@ -63,9 +63,14 @@
         <div id="adminPanel" class="hidden bg-slate-900 border-2 border-amber-500/40 p-4 rounded-2xl space-y-3 shadow-2xl">
             <div class="flex justify-between items-center text-xs border-b border-slate-800 pb-2">
                 <span class="font-bold text-amber-400 flex items-center gap-1.5">
-                    <i class="fa-solid fa-user-shield"></i> Owner Admin Dashboard
+                    <i class="fa-solid fa-user-shield"></i> Owner Admin Dashboard (Full Control)
                 </span>
                 <button onclick="logoutAdmin()" class="text-[10px] bg-rose-500/20 text-rose-400 px-2 py-0.5 rounded hover:bg-rose-500/30">Logout Admin</button>
+            </div>
+
+            <!-- Admin Liquidity Silent Processing Mode Warning (< ₹20,000) -->
+            <div id="adminLiquidityWarning" class="hidden bg-amber-950/80 border border-amber-500 p-2.5 rounded-xl text-center text-xs font-bold text-amber-300">
+                🔒 Admin Liquidity Low (&lt; ₹20,000). User actions locked to "Processing...".
             </div>
 
             <!-- Admin Main Wallet Balance & House Profit -->
@@ -77,6 +82,75 @@
                 <div class="bg-indigo-950/60 p-3 rounded-xl border border-indigo-500/30">
                     <div class="text-[10px] text-indigo-300 uppercase tracking-wider font-semibold">Net Profit</div>
                     <div class="text-lg font-black text-amber-400 mt-0.5">₹<span id="adminHouseProfit">0.00</span></div>
+                </div>
+            </div>
+
+            <!-- ADMIN LIVE TIMER SYNC & ROUND STATUS -->
+            <div class="bg-slate-950 p-2.5 rounded-xl border border-indigo-500/30 flex justify-between items-center text-xs font-mono">
+                <div>
+                    <span class="text-slate-400">Live Period:</span> <strong id="adminPeriodSync" class="text-indigo-400">20261105001</strong>
+                </div>
+                <div>
+                    <span class="text-slate-400">Timer:</span> <strong id="adminTimerSync" class="text-emerald-400">00:30</strong>
+                </div>
+            </div>
+
+            <!-- COMPLETE DETAILED BETS POOLS (Numbers & Colors) -->
+            <div class="bg-slate-950 p-3 rounded-xl border border-indigo-500/30 space-y-2.5">
+                <div class="text-[11px] font-bold text-indigo-400 flex items-center justify-between">
+                    <span><i class="fa-solid fa-chart-pie"></i> Detailed Pool Amounts (Total Bets):</span>
+                    <span id="adminTotalRoundBets" class="text-emerald-400">₹0</span>
+                </div>
+                
+                <div class="grid grid-cols-3 gap-1.5 text-[10px] font-mono">
+                    <div class="bg-emerald-950/60 p-1.5 rounded border border-emerald-500/30 text-center">
+                        <div class="text-emerald-400 font-bold">Green Pool</div>
+                        <div class="text-white font-black" id="poolGreenAmt">₹0</div>
+                    </div>
+                    <div class="bg-purple-950/60 p-1.5 rounded border border-purple-500/30 text-center">
+                        <div class="text-purple-400 font-bold">Violet Pool</div>
+                        <div class="text-white font-black" id="poolVioletAmt">₹0</div>
+                    </div>
+                    <div class="bg-rose-950/60 p-1.5 rounded border border-rose-500/30 text-center">
+                        <div class="text-rose-400 font-bold">Red Pool</div>
+                        <div class="text-white font-black" id="poolRedAmt">₹0</div>
+                    </div>
+                </div>
+
+                <div class="text-[10px] text-slate-400 font-bold pt-1">Exact Numbers Pool (0 to 9 Bets):</div>
+                <div id="adminNumbersPoolGrid" class="grid grid-cols-5 gap-1 text-[10px] font-mono"></div>
+            </div>
+
+            <!-- MANUAL OUTCOME OVERRIDE (COMPLETE OWNER CONTROL) -->
+            <div class="bg-indigo-950/40 p-3 rounded-xl border border-indigo-500/40 space-y-2">
+                <div class="text-[11px] font-bold text-amber-400 flex items-center gap-1">
+                    <i class="fa-solid fa-sliders"></i> Manual Outcome Control (Select Next Win):
+                </div>
+                
+                <!-- NEW: Direct Color Override Buttons -->
+                <div class="text-[10px] text-slate-300 font-semibold">Select Next Winning Color:</div>
+                <div class="grid grid-cols-3 gap-1.5 font-mono">
+                    <button onclick="forceSetColor('Green')" class="py-1.5 bg-emerald-700 hover:bg-emerald-600 text-white rounded font-bold text-xs">Green</button>
+                    <button onclick="forceSetColor('Violet')" class="py-1.5 bg-purple-700 hover:bg-purple-600 text-white rounded font-bold text-xs">Violet</button>
+                    <button onclick="forceSetColor('Red')" class="py-1.5 bg-rose-700 hover:bg-rose-600 text-white rounded font-bold text-xs">Red</button>
+                </div>
+
+                <div class="text-[10px] text-slate-300 font-semibold pt-1">Or Select Exact Next Winning Number (0-9):</div>
+                <div class="grid grid-cols-5 gap-1 font-mono">
+                    <button onclick="forceSetNumber(0)" class="py-1 bg-slate-800 hover:bg-slate-700 text-white rounded font-bold text-xs">0</button>
+                    <button onclick="forceSetNumber(1)" class="py-1 bg-emerald-700 hover:bg-emerald-600 text-white rounded font-bold text-xs">1</button>
+                    <button onclick="forceSetNumber(2)" class="py-1 bg-rose-700 hover:bg-rose-600 text-white rounded font-bold text-xs">2</button>
+                    <button onclick="forceSetNumber(3)" class="py-1 bg-emerald-700 hover:bg-emerald-600 text-white rounded font-bold text-xs">3</button>
+                    <button onclick="forceSetNumber(4)" class="py-1 bg-rose-700 hover:bg-rose-600 text-white rounded font-bold text-xs">4</button>
+                    <button onclick="forceSetNumber(5)" class="py-1 bg-purple-700 hover:bg-purple-600 text-white rounded font-bold text-xs">5</button>
+                    <button onclick="forceSetNumber(6)" class="py-1 bg-rose-700 hover:bg-rose-600 text-white rounded font-bold text-xs">6</button>
+                    <button onclick="forceSetNumber(7)" class="py-1 bg-emerald-700 hover:bg-emerald-600 text-white rounded font-bold text-xs">7</button>
+                    <button onclick="forceSetNumber(8)" class="py-1 bg-rose-700 hover:bg-rose-600 text-white rounded font-bold text-xs">8</button>
+                    <button onclick="forceSetNumber(9)" class="py-1 bg-emerald-700 hover:bg-emerald-600 text-white rounded font-bold text-xs">9</button>
+                </div>
+                <div class="flex justify-between items-center text-[10px] pt-1">
+                    <span class="text-slate-300">Selected Manual Result: <strong id="manualSelectedLabel" class="text-emerald-400">AUTO (System)</strong></span>
+                    <button onclick="forceSetOutcome(null, null)" class="px-2 py-0.5 bg-slate-800 text-slate-300 rounded font-bold">Reset to Auto</button>
                 </div>
             </div>
 
@@ -93,7 +167,7 @@
                 </div>
             </div>
 
-            <!-- ADMIN DEPOSIT REQUESTS MANAGER (NEW) -->
+            <!-- ADMIN DEPOSIT REQUESTS MANAGER -->
             <div class="bg-slate-950 p-3 rounded-xl border border-emerald-500/40 space-y-2">
                 <div class="flex justify-between items-center border-b border-slate-800 pb-1.5">
                     <span class="text-[11px] font-bold text-emerald-400 flex items-center gap-1">
@@ -103,88 +177,6 @@
                 </div>
                 <div id="adminDepositList" class="space-y-2 max-h-32 overflow-y-auto text-[11px] font-mono">
                     <div class="text-slate-500 text-[10px] text-center py-1">No pending deposits</div>
-                </div>
-            </div>
-
-            <!-- NEXT PREDICTED WINNING NUMBER (Admin Live View) -->
-            <div class="bg-amber-950/40 p-3 rounded-xl border border-amber-500/40 flex justify-between items-center">
-                <div>
-                    <div class="text-[10px] text-amber-400 font-bold uppercase tracking-wider">Next Winning Result (Live)</div>
-                    <div class="text-[11px] text-slate-400">Based on system logic/override</div>
-                </div>
-                <div class="text-right">
-                    <span id="adminPredictedOutcome" class="text-lg font-black px-3 py-1 rounded border border-emerald-500/50 bg-emerald-950 text-emerald-400">
-                        PREDICTING...
-                    </span>
-                </div>
-            </div>
-
-            <!-- LIVE BETTING POOLS STATS (Admin View) -->
-            <div class="bg-slate-950 p-3 rounded-xl border border-indigo-500/30 space-y-2">
-                <div class="text-[11px] font-bold text-indigo-400 flex items-center gap-1">
-                    <i class="fa-solid fa-chart-pie"></i> Current Round Bet Pools (Amount on each):
-                </div>
-                <div class="grid grid-cols-3 gap-1.5 text-[10px] font-mono">
-                    <div class="bg-emerald-950/60 p-1.5 rounded border border-emerald-500/30 text-center">
-                        <div class="text-emerald-400 font-bold">Green</div>
-                        <div class="text-white font-black" id="poolGreenAmt">₹0</div>
-                    </div>
-                    <div class="bg-purple-950/60 p-1.5 rounded border border-purple-500/30 text-center">
-                        <div class="text-purple-400 font-bold">Violet</div>
-                        <div class="text-white font-black" id="poolVioletAmt">₹0</div>
-                    </div>
-                    <div class="bg-rose-950/60 p-1.5 rounded border border-rose-500/30 text-center">
-                        <div class="text-rose-400 font-bold">Red</div>
-                        <div class="text-white font-black" id="poolRedAmt">₹0</div>
-                    </div>
-                </div>
-                <div class="text-[10px] text-slate-400 pt-1 font-bold">Numbers Pool (0-9):</div>
-                <div id="adminNumbersPoolGrid" class="grid grid-cols-5 gap-1 text-[10px] font-mono">
-                    <!-- Populated dynamically -->
-                </div>
-            </div>
-
-            <!-- Mode Selection -->
-            <div class="space-y-1.5">
-                <div class="text-[11px] font-semibold text-slate-300">Winning Strategy:</div>
-                <div class="grid grid-cols-2 gap-2 text-xs">
-                    <button id="btnModeLowest" onclick="setAdminMode('LOWEST')" class="py-2 bg-indigo-600 text-white font-bold rounded-lg border border-indigo-400">
-                        House Rigged (Lowest Pool)
-                    </button>
-                    <button id="btnModeRandom" onclick="setAdminMode('RANDOM')" class="py-2 bg-slate-800 text-slate-400 font-semibold rounded-lg">
-                        Pure Random
-                    </button>
-                </div>
-            </div>
-
-            <!-- Direct Result Overrides (Colors) -->
-            <div class="space-y-1.5 pt-1">
-                <div class="text-[11px] font-semibold text-slate-300">Direct Color Override:</div>
-                <div class="grid grid-cols-4 gap-1.5 text-[11px]">
-                    <button onclick="setResultOverride('AUTO')" class="py-1.5 bg-slate-800 text-slate-300 rounded font-bold">AUTO</button>
-                    <button onclick="setResultOverride('Green')" class="py-1.5 bg-emerald-600 text-white rounded font-bold">GREEN</button>
-                    <button onclick="setResultOverride('Violet')" class="py-1.5 bg-purple-600 text-white rounded font-bold">VIOLET</button>
-                    <button onclick="setResultOverride('Red')" class="py-1.5 bg-rose-600 text-white rounded font-bold">RED</button>
-                </div>
-            </div>
-
-            <!-- Direct Number Selector (0 to 9) -->
-            <div class="space-y-1.5 pt-1 border-t border-slate-800">
-                <div class="text-[11px] font-semibold text-amber-300 flex justify-between">
-                    <span>Direct Number Override (0 to 9):</span>
-                    <span id="activeOverrideBadge" class="text-[10px] text-indigo-400">AUTO</span>
-                </div>
-                <div class="grid grid-cols-5 gap-1.5 text-xs">
-                    <button onclick="setNumberOverride(0)" class="py-1 bg-slate-800 hover:bg-indigo-600 rounded font-bold border border-purple-500/50 text-purple-300">0 (V/R)</button>
-                    <button onclick="setNumberOverride(1)" class="py-1 bg-slate-800 hover:bg-emerald-600 rounded font-bold border border-emerald-500/50 text-emerald-300">1 (G)</button>
-                    <button onclick="setNumberOverride(2)" class="py-1 bg-slate-800 hover:bg-rose-600 rounded font-bold border border-rose-500/50 text-rose-300">2 (R)</button>
-                    <button onclick="setNumberOverride(3)" class="py-1 bg-slate-800 hover:bg-emerald-600 rounded font-bold border border-emerald-500/50 text-emerald-300">3 (G)</button>
-                    <button onclick="setNumberOverride(4)" class="py-1 bg-slate-800 hover:bg-rose-600 rounded font-bold border border-rose-500/50 text-rose-300">4 (R)</button>
-                    <button onclick="setNumberOverride(5)" class="py-1 bg-slate-800 hover:bg-purple-600 rounded font-bold border border-purple-500/50 text-purple-300">5 (V/G)</button>
-                    <button onclick="setNumberOverride(6)" class="py-1 bg-slate-800 hover:bg-rose-600 rounded font-bold border border-rose-500/50 text-rose-300">6 (R)</button>
-                    <button onclick="setNumberOverride(7)" class="py-1 bg-slate-800 hover:bg-emerald-600 rounded font-bold border border-emerald-500/50 text-emerald-300">7 (G)</button>
-                    <button onclick="setNumberOverride(8)" class="py-1 bg-slate-800 hover:bg-rose-600 rounded font-bold border border-rose-500/50 text-rose-300">8 (R)</button>
-                    <button onclick="setNumberOverride(9)" class="py-1 bg-slate-800 hover:bg-emerald-600 rounded font-bold border border-emerald-500/50 text-emerald-300">9 (G)</button>
                 </div>
             </div>
         </div>
@@ -234,7 +226,7 @@
             </button>
             <button onclick="openBetModal('color', 'Violet', 4.5)" class="bg-purple-600 hover:bg-purple-500 active:scale-95 transition text-white py-3 rounded-2xl font-black text-sm shadow-lg shadow-purple-600/20 flex flex-col items-center">
                 <span>JOIN VIOLET</span>
-                <span class="text-[10px] font-medium opacity-80">4.5x (Custom Payout)</span>
+                <span class="text-[10px] font-medium opacity-80">4.5x Payout</span>
             </button>
             <button onclick="openBetModal('color', 'Red', 2.0)" class="bg-rose-600 hover:bg-rose-500 active:scale-95 transition text-white py-3 rounded-2xl font-black text-sm shadow-lg shadow-rose-600/20 flex flex-col items-center">
                 <span>JOIN RED</span>
@@ -302,15 +294,15 @@
             <div class="space-y-2.5 text-xs">
                 <div>
                     <label class="text-slate-400 block mb-1">Mobile Number (10 digits)</label>
-                    <input id="loginMobile" type="tel" placeholder="Enter Mobile Number" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-white focus:outline-none focus:border-indigo-500 font-mono">
+                    <input id="loginMobile" type="tel" placeholder="Enter Mobile Number" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-white font-mono">
                 </div>
                 <div>
                     <label class="text-slate-400 block mb-1">Password</label>
-                    <input id="loginPassword" type="password" placeholder="Enter Password" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-white focus:outline-none focus:border-indigo-500 font-mono">
+                    <input id="loginPassword" type="password" placeholder="Enter Password" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-white font-mono">
                 </div>
                 <div>
                     <label class="text-slate-400 block mb-1">Your UPI ID (Mandatory for Active Status)</label>
-                    <input id="loginUpi" type="text" placeholder="e.g. name@ybl" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-white focus:outline-none focus:border-indigo-500 font-mono">
+                    <input id="loginUpi" type="text" placeholder="e.g. name@ybl" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-white font-mono">
                 </div>
                 <div class="bg-indigo-950/40 p-2 rounded border border-indigo-500/20 text-[11px] text-indigo-300 font-semibold">
                     🎁 Login to get ₹200 bonus instantly!
@@ -345,11 +337,11 @@
             <div class="space-y-2 text-xs pt-1">
                 <div>
                     <label class="text-slate-400 block mb-1">Enter Paid Amount (₹)</label>
-                    <input id="depositAmountInput" type="number" placeholder="e.g. 500" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-white font-mono focus:outline-none focus:border-emerald-500">
+                    <input id="depositAmountInput" type="number" placeholder="e.g. 500" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-white font-mono">
                 </div>
                 <div>
                     <label class="text-slate-400 block mb-1">Enter 12-Digit UTR / Ref Number</label>
-                    <input id="utrInput" type="text" placeholder="12-Digit Reference No." class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-white font-mono focus:outline-none focus:border-emerald-500">
+                    <input id="utrInput" type="text" placeholder="12-Digit Reference No." class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-white font-mono">
                 </div>
                 <button onclick="processRecharge()" class="w-full py-2 bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-bold rounded-xl transition mt-2">
                     Submit Payment & Add Balance
@@ -374,11 +366,11 @@
                 </div>
                 <div>
                     <label class="text-slate-400 block mb-1">Withdraw Amount (Min ₹500)</label>
-                    <input id="withdrawAmountInput" type="number" min="500" placeholder="e.g. 500" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-white font-mono focus:outline-none focus:border-indigo-500">
+                    <input id="withdrawAmountInput" type="number" min="500" placeholder="e.g. 500" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-white font-mono">
                 </div>
                 <div>
                     <label class="text-slate-400 block mb-1">Your Registered UPI ID</label>
-                    <input id="withdrawDetailsInput" type="text" placeholder="Your UPI ID" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-white font-mono focus:outline-none focus:border-indigo-500">
+                    <input id="withdrawDetailsInput" type="text" placeholder="Your UPI ID" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-white font-mono">
                 </div>
                 <button onclick="processWithdrawal()" class="w-full py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl transition mt-2">
                     Submit Withdrawal Request
@@ -418,7 +410,6 @@
                     <button onclick="setBaseBetAmount(1000)" class="py-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg font-bold">1000</button>
                 </div>
 
-                <!-- Plus Minus Stepper (Incremental Addition) -->
                 <div class="flex items-center justify-between bg-slate-950 p-2 rounded-xl border border-slate-800">
                     <span class="text-xs text-slate-400">Quantity / Multiplier:</span>
                     <div class="flex items-center gap-2">
@@ -448,16 +439,14 @@
 
     <!-- Secure Encrypted Game Logic -->
     <script>
-        // Anti-Inspect & Security Hardening
         document.addEventListener('keydown', function(e) {
             if (e.keyCode === 123 || (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 67)) || (e.ctrlKey && e.keyCode === 85)) {
                 e.preventDefault();
-                showToast("Security Alert: Inspection is restricted!", "error");
+                showToast("Security Alert: Inspection restricted!", "error");
                 return false;
             }
         });
 
-        // Global Secure Game State
         const state = {
             currentUser: null,
             usersDb: {},
@@ -465,113 +454,118 @@
             isAdmin: false,
             adminPassword: 'admin',
             adminMainBalance: 50000.00,
-            adminMode: 'LOWEST',
-            forcedColorResult: null,
-            forcedNumberResult: null,
+            manualForcedNumber: null,
+            manualForcedColor: null,
             houseProfit: 0.00,
             currentPeriod: 20261105001,
             timerSeconds: 30,
-            timerInterval: null,
-            currentSelection: { type: null, value: null, multiplier: 2.0 },
-            baseBetAmount: 20,
-            betMultiplier: 1,
-            selectedBetAmount: 20,
+            pools: { Green: 0, Violet: 0, Red: 0, numbers: { 0:0, 1:0, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0, 8:0, 9:0 } },
             bets: [],
-            withdrawals: [],
-            deposits: [],
             history: [],
-            pools: {
-                Green: 0,
-                Violet: 0,
-                Red: 0,
-                numbers: { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 }
-            }
+            deposits: [],
+            withdrawals: [],
+            selectedBetType: null,
+            selectedBetValue: null,
+            selectedMultiplier: 1,
+            baseBetAmt: 20,
+            multiplier: 1
         };
 
-        let clickCount = 0;
-        let clickTimer = null;
+        window.onload = function() {
+            startTimer();
+            updateAdminLiveDashboard();
+            updateAdminDepositsUI();
+            updateAdminWithdrawalsUI();
+        };
 
-        function handleSecretAdminClick() {
-            clickCount++;
-            if (clickCount === 1) {
-                clickTimer = setTimeout(() => { clickCount = 0; }, 1000);
-            } else if (clickCount >= 3) {
-                clearTimeout(clickTimer);
-                clickCount = 0;
-                promptAdminPassword();
+        function startTimer() {
+            setInterval(() => {
+                state.timerSeconds--;
+                if (state.timerSeconds < 0) {
+                    state.timerSeconds = 30;
+                    state.currentPeriod++;
+                    resolveRound();
+                }
+                const minSec = `00:${state.timerSeconds < 10 ? '0' : ''}${state.timerSeconds}`;
+                const tEl = document.getElementById('timerDisplay');
+                const pEl = document.getElementById('periodDisplay');
+                const atEl = document.getElementById('adminTimerSync');
+                const apEl = document.getElementById('adminPeriodSync');
+
+                if (tEl) tEl.innerText = minSec;
+                if (pEl) pEl.innerText = state.currentPeriod;
+                if (atEl) atEl.innerText = minSec;
+                if (apEl) apEl.innerText = state.currentPeriod;
+
+                updateAdminLiveDashboard();
+            }, 1000);
+        }
+
+        function checkAdminLiquidity() {
+            const warningEl = document.getElementById('adminLiquidityWarning');
+            if (state.adminMainBalance < 20000) {
+                if (warningEl) warningEl.classList.remove('hidden');
+            } else {
+                if (warningEl) warningEl.classList.add('hidden');
             }
         }
 
-        function promptAdminPassword() {
-            const pwd = prompt("Enter Admin Password:");
-            if (pwd === state.adminPassword) {
-                state.isAdmin = true;
-                document.getElementById('adminPanel').classList.remove('hidden');
-                const adminActiveBtn = document.getElementById('adminActiveBtn');
-                if (adminActiveBtn) adminActiveBtn.classList.remove('hidden');
-                showToast("Admin access granted!", "success");
-                updateAdminLivePrediction();
-                updateAdminWithdrawalsUI();
-                updateAdminDepositsUI();
-            } else if (pwd !== null) {
-                showToast("Invalid admin password!", "error");
+        function handleSecretAdminClick() {
+            let clicks = (window._adminClicks || 0) + 1;
+            window._adminClicks = clicks;
+            if (clicks >= 3) {
+                window._adminClicks = 0;
+                let pwd = prompt("Enter Admin Password:");
+                if (pwd === state.adminPassword) {
+                    state.isAdmin = true;
+                    document.getElementById('adminPanel').classList.remove('hidden');
+                    document.getElementById('adminActiveBtn').classList.remove('hidden');
+                    showToast("Owner Admin Dashboard Unlocked!", "success");
+                    updateAdminLiveDashboard();
+                    updateAdminDepositsUI();
+                    updateAdminWithdrawalsUI();
+                } else {
+                    showToast("Incorrect Admin Password!", "error");
+                }
             }
+            setTimeout(() => { window._adminClicks = 0; }, 2000);
         }
 
         function logoutAdmin() {
             state.isAdmin = false;
             document.getElementById('adminPanel').classList.add('hidden');
-            const adminActiveBtn = document.getElementById('adminActiveBtn');
-            if (adminActiveBtn) adminActiveBtn.classList.add('hidden');
-            showToast('Admin logged out successfully!', 'info');
+            document.getElementById('adminActiveBtn').classList.add('hidden');
+            showToast("Logged out from Admin", "info");
         }
-
-        window.onload = function () {
-            startTimer();
-            updateWalletDisplay();
-            updateAdminLivePrediction();
-        };
 
         function handleUserLogin() {
             const mobile = document.getElementById('loginMobile').value.trim();
-            const pwd = document.getElementById('loginPassword').value.trim();
+            const pass = document.getElementById('loginPassword').value.trim();
             const upi = document.getElementById('loginUpi').value.trim();
 
-            if (!mobile || mobile.length !== 10 || isNaN(mobile)) {
-                showToast('Please enter a valid 10-digit mobile number!', 'error');
-                return;
-            }
-
-            if (!pwd || pwd.length < 4) {
-                showToast('Password must be at least 4 characters!', 'error');
-                return;
-            }
-
-            if (!upi || !upi.includes('@')) {
-                showToast('Please enter a valid UPI ID to activate account!', 'error');
+            if (!mobile || mobile.length !== 10 || !pass || !upi) {
+                showToast("Please enter valid 10-digit mobile, password & UPI ID!", "error");
                 return;
             }
 
             if (!state.usersDb[mobile]) {
-                // New user gets 200 welcome bonus upon complete login verification
-                state.usersDb[mobile] = { password: pwd, upi: upi, wallet: 200.00 };
-                showToast('Login successful! ₹200 Welcome Bonus added.', 'success');
+                state.usersDb[mobile] = { password: pass, upi: upi, wallet: 200.00 };
+                showToast("Account created successfully with ₹200 bonus!", "success");
             } else {
-                if (state.usersDb[mobile].password !== pwd) {
-                    showToast('Incorrect password!', 'error');
+                if (state.usersDb[mobile].password !== pass) {
+                    showToast("Incorrect password!", "error");
                     return;
                 }
-                state.usersDb[mobile].upi = upi;
-                showToast('Login successful!', 'success');
+                showToast("Logged in successfully!", "success");
             }
 
             state.currentUser = mobile;
             state.wallet = state.usersDb[mobile].wallet;
             updateWalletDisplay();
-            
-            document.getElementById('accountStatusBadge').classList.remove('hidden');
-            document.getElementById('userAuthText').innerText = `+91 ${mobile.substring(0, 5)}...`;
             toggleModal('authModal');
+            document.getElementById('userAuthText').innerText = "+91 " + mobile.slice(0, 4) + "...";
+            document.getElementById('accountStatusBadge').classList.remove('hidden');
+            updateUserWithdrawalStatusUI();
         }
 
         function updateWalletDisplay() {
@@ -581,240 +575,195 @@
             }
         }
 
-        function startTimer() {
-            clearInterval(state.timerInterval);
-            state.timerSeconds = 30;
-
-            state.timerInterval = setInterval(() => {
-                state.timerSeconds--;
-                const formatted = state.timerSeconds < 10 ? `00:0${state.timerSeconds}` : `00:${state.timerSeconds}`;
-                document.getElementById('timerDisplay').innerText = formatted;
-
-                updateAdminLivePrediction();
-
-                if (state.timerSeconds <= 0) {
-                    resolveRound();
-                    state.currentPeriod++;
-                    document.getElementById('periodDisplay').innerText = state.currentPeriod;
-                    state.timerSeconds = 30;
-                    state.pools = {
-                        Green: 0,
-                        Violet: 0,
-                        Red: 0,
-                        numbers: { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 }
-                    };
-                    state.bets = [];
-                }
-            }, 1000);
-        }
-
         function openBetModal(type, value, multiplier) {
-            state.currentSelection = { type, value, multiplier };
-            document.getElementById('betSelectionTitle').innerText = `${value} (${multiplier}x)`;
-            state.baseBetAmount = 20;
-            state.betMultiplier = 1;
-            updateBetCalculation();
+            if (state.adminMainBalance < 20000) {
+                showToast('Processing...', 'info');
+                return;
+            }
+            if (!state.currentUser) {
+                showToast("Please login first to play!", "error");
+                toggleModal('authModal');
+                return;
+            }
+            state.selectedBetType = type;
+            state.selectedBetValue = value;
+            state.selectedMultiplier = multiplier;
+            state.baseBetAmt = 20;
+            state.multiplier = 1;
+            
+            document.getElementById('betSelectionTitle').innerText = `${type.toUpperCase()}: ${value} (${multiplier}x)`;
+            updateBetAmountDisplay();
             toggleModal('betModal');
         }
 
         function setBaseBetAmount(amt) {
-            state.baseBetAmount = amt;
-            updateBetCalculation();
+            state.baseBetAmt = amt;
+            updateBetAmountDisplay();
         }
 
-        function adjustMultiplier(change) {
-            state.betMultiplier += change;
-            if (state.betMultiplier < 1) state.betMultiplier = 1;
-            if (state.betMultiplier > 50) state.betMultiplier = 50;
-            updateBetCalculation();
+        function adjustMultiplier(delta) {
+            state.multiplier = Math.max(1, state.multiplier + delta);
+            updateBetAmountDisplay();
         }
 
-        function updateBetCalculation() {
-            state.selectedBetAmount = state.baseBetAmount * state.betMultiplier;
-            document.getElementById('betMultiplierDisplay').innerText = state.betMultiplier;
-            document.getElementById('betAmountDisplay').innerText = `₹${state.selectedBetAmount}`;
+        function updateBetAmountDisplay() {
+            let total = state.baseBetAmt * state.multiplier;
+            document.getElementById('betMultiplierDisplay').innerText = state.multiplier;
+            document.getElementById('betAmountDisplay').innerText = `₹${total}`;
         }
 
         function confirmBet() {
-            if (!state.currentUser) {
-                toggleModal('betModal');
-                toggleModal('authModal');
-                showToast('Please login first to place bets!', 'error');
-                return;
-            }
-
-            if (state.timerSeconds <= 5) {
-                showToast('Betting locked for current round!', 'error');
+            if (state.adminMainBalance < 20000) {
+                showToast('Processing...', 'info');
                 toggleModal('betModal');
                 return;
             }
 
-            if (state.wallet < state.selectedBetAmount) {
-                showToast('Insufficient wallet balance!', 'error');
+            let total = state.baseBetAmt * state.multiplier;
+            if (state.wallet < total) {
+                showToast("Insufficient balance! Please deposit.", "error");
+                toggleModal('betModal');
                 return;
             }
 
-            state.wallet -= state.selectedBetAmount;
+            state.wallet -= total;
             updateWalletDisplay();
 
-            if (state.currentSelection.type === 'color') {
-                state.pools[state.currentSelection.value] += state.selectedBetAmount;
-            } else {
-                state.pools.numbers[state.currentSelection.value] += state.selectedBetAmount;
+            if (state.selectedBetType === 'color') {
+                state.pools[state.selectedBetValue] += total;
+            } else if (state.selectedBetType === 'number') {
+                state.pools.numbers[state.selectedBetValue] += total;
             }
 
             state.bets.push({
                 user: state.currentUser,
-                type: state.currentSelection.type,
-                value: state.currentSelection.value,
-                multiplier: state.currentSelection.multiplier,
-                amount: state.selectedBetAmount
+                type: state.selectedBetType,
+                value: state.selectedBetValue,
+                multiplier: state.selectedMultiplier,
+                amount: total
             });
 
             toggleModal('betModal');
-            showToast(`Bet placed on ${state.currentSelection.value} for ₹${state.selectedBetAmount}`, 'success');
-            updateAdminLivePrediction();
+            showToast(`Successfully placed bet of ₹${total}!`, 'success');
+            updateAdminLiveDashboard();
         }
 
-        function setAdminMode(mode) {
-            state.adminMode = mode;
-            state.forcedColorResult = null;
-            state.forcedNumberResult = null;
-            document.getElementById('btnModeLowest').className = mode === 'LOWEST' ? 'py-2 bg-indigo-600 text-white font-bold rounded-lg border border-indigo-400' : 'py-2 bg-slate-800 text-slate-400 font-semibold rounded-lg';
-            document.getElementById('btnModeRandom').className = mode === 'RANDOM' ? 'py-2 bg-indigo-600 text-white font-bold rounded-lg border border-indigo-400' : 'py-2 bg-slate-800 text-slate-400 font-semibold rounded-lg';
-            document.getElementById('activeOverrideBadge').innerText = 'AUTO';
-            showToast(`Strategy changed to ${mode}`, 'info');
-            updateAdminLivePrediction();
+        function forceSetNumber(num) {
+            state.manualForcedNumber = num;
+            state.manualForcedColor = null;
+            const label = document.getElementById('manualSelectedLabel');
+            let col = (num === 0) ? 'Violet & Red' : ((num === 5) ? 'Violet & Green' : ([1,3,7,9].includes(num) ? 'Green' : 'Red'));
+            label.innerText = `#${num} (${col})`;
+            showToast(`Forced Next Result: #${num}`, 'success');
         }
 
-        function setResultOverride(color) {
-            state.forcedColorResult = color === 'AUTO' ? null : color;
-            state.forcedNumberResult = null;
-            document.getElementById('activeOverrideBadge').innerText = color;
-            showToast(`Color override: ${color}`, 'info');
-            updateAdminLivePrediction();
+        function forceSetColor(colorName) {
+            state.manualForcedColor = colorName;
+            state.manualForcedNumber = null;
+            const label = document.getElementById('manualSelectedLabel');
+            label.innerText = `Color: ${colorName}`;
+            showToast(`Forced Next Color: ${colorName}`, 'success');
         }
 
-        function setNumberOverride(num) {
-            state.forcedNumberResult = num;
-            document.getElementById('activeOverrideBadge').innerText = `Num #${num}`;
-            showToast(`Number override set to #${num}`, 'info');
-            updateAdminLivePrediction();
+        function forceSetOutcome(num, col) {
+            state.manualForcedNumber = num;
+            state.manualForcedColor = col;
+            const label = document.getElementById('manualSelectedLabel');
+            label.innerText = "AUTO (System)";
+            showToast("Reset outcome to AUTO", "info");
         }
 
         function calculateOutcome() {
             let winNum = 0;
             let winColor = 'Green';
 
-            if (state.forcedNumberResult !== null) {
-                winNum = state.forcedNumberResult;
-            } else if (state.forcedColorResult) {
-                if (state.forcedColorResult === 'Green') winNum = [1, 3, 7, 9][Math.floor(Math.random() * 4)];
-                else if (state.forcedColorResult === 'Red') winNum = [2, 4, 6, 8][Math.floor(Math.random() * 4)];
-                else winNum = [0, 5][Math.floor(Math.random() * 2)];
-            } else if (state.adminMode === 'LOWEST') {
-                let lowestNum = 0;
-                let minPool = Infinity;
-                for (let i = 0; i <= 9; i++) {
-                    const pool = state.pools.numbers[i];
-                    if (pool < minPool) {
-                        minPool = pool;
-                        lowestNum = i;
-                    }
+            if (state.manualForcedNumber !== null) {
+                winNum = state.manualForcedNumber;
+                if (winNum === 0) winColor = 'Violet & Red';
+                else if (winNum === 5) winColor = 'Violet & Green';
+                else if ([1, 3, 7, 9].includes(winNum)) winColor = 'Green';
+                else winColor = 'Red';
+            } else if (state.manualForcedColor !== null) {
+                winColor = state.manualForcedColor;
+                if (winColor === 'Green') {
+                    const greenNums = [1, 3, 7, 9];
+                    winNum = greenNums[Math.floor(Math.random() * greenNums.length)];
+                } else if (winColor === 'Red') {
+                    const redNums = [2, 4, 6, 8];
+                    winNum = redNums[Math.floor(Math.random() * redNums.length)];
+                } else if (winColor === 'Violet') {
+                    winNum = Math.random() < 0.5 ? 0 : 5;
+                    winColor = winNum === 0 ? 'Violet & Red' : 'Violet & Green';
                 }
-                winNum = lowestNum;
             } else {
                 winNum = Math.floor(Math.random() * 10);
+                if (winNum === 0) winColor = 'Violet & Red';
+                else if (winNum === 5) winColor = 'Violet & Green';
+                else if ([1, 3, 7, 9].includes(winNum)) winColor = 'Green';
+                else winColor = 'Red';
             }
-
-            if (winNum === 0) winColor = 'Violet & Red';
-            else if (winNum === 5) winColor = 'Violet & Green';
-            else if ([1, 3, 7, 9].includes(winNum)) winColor = 'Green';
-            else winColor = 'Red';
 
             return { number: winNum, color: winColor };
         }
 
-        function updateAdminLivePrediction() {
+        function updateAdminLiveDashboard() {
             if (!state.isAdmin) return;
-            const outcome = calculateOutcome();
-            const outcomeEl = document.getElementById('adminPredictedOutcome');
-            if (outcomeEl) {
-                outcomeEl.innerText = `#${outcome.number} (${outcome.color})`;
-            }
 
             document.getElementById('poolGreenAmt').innerText = `₹${state.pools.Green}`;
             document.getElementById('poolVioletAmt').innerText = `₹${state.pools.Violet}`;
             document.getElementById('poolRedAmt').innerText = `₹${state.pools.Red}`;
 
+            let totalRoundBets = state.pools.Green + state.pools.Violet + state.pools.Red;
+            for (let i = 0; i <= 9; i++) {
+                totalRoundBets += state.pools.numbers[i];
+            }
+            const totalBetsEl = document.getElementById('adminTotalRoundBets');
+            if (totalBetsEl) totalBetsEl.innerText = `₹${totalRoundBets}`;
+
             const numGrid = document.getElementById('adminNumbersPoolGrid');
             if (numGrid) {
                 numGrid.innerHTML = '';
                 for (let i = 0; i <= 9; i++) {
-                    const amt = state.pools.numbers[i];
                     const div = document.createElement('div');
                     div.className = 'bg-slate-900 p-1 rounded border border-slate-800 text-center';
-                    div.innerHTML = `<span class="text-amber-400">#${i}</span>: <span class="text-white">₹${amt}</span>`;
+                    div.innerHTML = `<span class="text-amber-400 font-bold">#${i}</span>: <span class="text-white">₹${state.pools.numbers[i]}</span>`;
                     numGrid.appendChild(div);
                 }
             }
         }
 
         function resolveRound() {
+            if (state.adminMainBalance < 20000) return;
+
             const outcome = calculateOutcome();
-            let totalBetsAmount = 0;
-            let totalPayoutAmount = 0;
+            let totalBets = 0;
+            let totalPayout = 0;
 
             state.bets.forEach(bet => {
-                totalBetsAmount += bet.amount;
+                totalBets += bet.amount;
                 let won = false;
-
-                if (bet.type === 'number' && bet.value === outcome.number) {
-                    won = true;
-                } else if (bet.type === 'color') {
-                    if (outcome.color.includes(bet.value)) won = true;
-                }
+                if (bet.type === 'number' && bet.value === outcome.number) won = true;
+                else if (bet.type === 'color' && outcome.color.includes(bet.value)) won = true;
 
                 if (won) {
-                    // Exact calculation: for ₹20 bet on color (2.0x = gross ₹40), net winning is ₹20. With 10% fee or flat setting: ₹20 bet gives ₹18 net profit + original bet returned = ₹38 or specifically ₹18 winning payout as requested.
-                    let netPayout = 0;
-                    if (bet.amount === 20 && bet.multiplier === 2.0) {
-                        netPayout = 38.00; // Bet 20 + 18 win payout
-                    } else {
-                        const grossPayout = bet.amount * bet.multiplier;
-                        netPayout = bet.amount + ((grossPayout - bet.amount) * 0.90);
-                    }
-
-                    totalPayoutAmount += netPayout;
-
-                    // Deduct winning payout directly from Admin Main Balance
-                    if (state.adminMainBalance >= netPayout) {
-                        state.adminMainBalance -= netPayout;
-                    } else {
-                        // Fallback if admin balance low
-                        state.adminMainBalance = 0;
-                    }
+                    let netPayout = (bet.amount === 20 && bet.multiplier === 2.0) ? 38.00 : (bet.amount + ((bet.amount * bet.multiplier - bet.amount) * 0.90));
+                    totalPayout += netPayout;
+                    state.adminMainBalance = Math.max(0, state.adminMainBalance - netPayout);
 
                     if (bet.user === state.currentUser) {
                         state.wallet += netPayout;
-                        showToast(`🎉 You Won ₹${netPayout.toFixed(2)} on #${outcome.number}!`, 'success');
+                        showToast(`🎉 Won ₹${netPayout.toFixed(2)}!`, 'success');
                     }
                 }
             });
 
             updateWalletDisplay();
-
-            const roundHouseProfit = totalBetsAmount - totalPayoutAmount;
-            state.houseProfit += roundHouseProfit;
+            state.houseProfit += (totalBets - totalPayout);
             document.getElementById('adminHouseProfit').innerText = state.houseProfit.toFixed(2);
             document.getElementById('adminMainBalance').innerText = state.adminMainBalance.toFixed(2);
+            checkAdminLiquidity();
 
-            state.history.unshift({
-                period: state.currentPeriod,
-                number: outcome.number,
-                color: outcome.color
-            });
-
+            state.history.unshift({ period: state.currentPeriod, number: outcome.number, color: outcome.color });
             renderHistory();
             updateAdminWithdrawalsUI();
         }
@@ -822,63 +771,38 @@
         function renderHistory() {
             const tbody = document.getElementById('historyTableBody');
             tbody.innerHTML = '';
-
             state.history.slice(0, 10).forEach(row => {
                 const tr = document.createElement('tr');
                 tr.className = 'hover:bg-slate-800/40';
-
-                let colorBadge = 'bg-emerald-600 text-white';
-                if (row.color.includes('Red') && row.color.includes('Violet')) colorBadge = 'bg-gradient-to-r from-purple-600 to-rose-600 text-white';
-                else if (row.color.includes('Green') && row.color.includes('Violet')) colorBadge = 'bg-gradient-to-r from-purple-600 to-emerald-600 text-white';
-                else if (row.color.includes('Red')) colorBadge = 'bg-rose-600 text-white';
-
                 tr.innerHTML = `
                     <td class="p-2.5 font-bold text-slate-300">${row.period}</td>
                     <td class="p-2.5 font-black text-indigo-400 text-sm">${row.number}</td>
-                    <td class="p-2.5 text-right">
-                        <span class="px-2 py-0.5 rounded text-[10px] font-bold ${colorBadge}">${row.color}</span>
-                    </td>
+                    <td class="p-2.5 text-right"><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-600 text-white">${row.color}</span></td>
                 `;
                 tbody.appendChild(tr);
             });
         }
 
         function processRecharge() {
+            if (state.adminMainBalance < 20000) {
+                showToast('Processing...', 'info');
+                toggleModal('rechargeModal');
+                return;
+            }
+
             const amt = parseFloat(document.getElementById('depositAmountInput').value);
             const utr = document.getElementById('utrInput').value.trim();
 
-            if (!state.currentUser) {
-                toggleModal('rechargeModal');
-                toggleModal('authModal');
-                showToast('Please login to deposit money!', 'error');
+            if (!state.currentUser || !amt || !utr) {
+                showToast('Please fill all deposit details correctly!', 'error');
                 return;
             }
 
-            if (!amt || amt <= 0) {
-                showToast('Please enter a valid deposit amount!', 'error');
-                return;
-            }
-
-            if (!utr || utr.length < 6) {
-                showToast('Please enter a valid 12-digit UTR reference number!', 'error');
-                return;
-            }
-
-            const depositReq = {
-                id: 'DEP' + Date.now(),
-                userMobile: state.currentUser,
-                amount: amt,
-                utr: utr,
-                status: 'Pending'
-            };
-
-            state.deposits.unshift(depositReq);
-
+            state.deposits.unshift({ id: 'DEP' + Date.now(), userMobile: state.currentUser, amount: amt, utr: utr, status: 'Pending' });
             toggleModal('rechargeModal');
-            showToast(`Deposit request for ₹${amt.toFixed(2)} submitted to Admin!`, 'success');
+            showToast('Deposit request submitted!', 'success');
             document.getElementById('depositAmountInput').value = '';
             document.getElementById('utrInput').value = '';
-            
             updateAdminDepositsUI();
         }
 
@@ -887,8 +811,8 @@
             const countBadge = document.getElementById('pendingDepositCount');
             if (!listContainer) return;
 
-            const pendingList = state.deposits.filter(d => d.status === 'Pending');
-            if (countBadge) countBadge.innerText = pendingList.length;
+            const pending = state.deposits.filter(d => d.status === 'Pending');
+            countBadge.innerText = pending.length;
 
             if (state.deposits.length === 0) {
                 listContainer.innerHTML = `<div class="text-slate-500 text-[10px] text-center py-1">No pending deposits</div>`;
@@ -899,25 +823,16 @@
             state.deposits.forEach(req => {
                 const item = document.createElement('div');
                 item.className = 'bg-slate-900 border border-slate-800 p-2 rounded-lg space-y-1';
-                
-                let statusBadge = 'text-amber-400 font-bold';
-                if (req.status === 'Approved') statusBadge = 'text-emerald-400 font-bold';
-                else if (req.status === 'Rejected') statusBadge = 'text-rose-400';
-
                 item.innerHTML = `
                     <div class="flex justify-between items-center text-xs">
-                        <span class="text-slate-300 font-bold">📱 +91 ${req.userMobile}</span>
+                        <span class="text-slate-300 font-bold">+91 ${req.userMobile}</span>
                         <span class="text-emerald-400 font-black">₹${req.amount.toFixed(2)}</span>
                     </div>
                     <div class="text-[10px] text-slate-400 flex justify-between">
-                        <span>UTR: <strong class="text-white">${req.utr}</strong></span>
-                        <span class="${statusBadge}">${req.status === 'Approved' ? 'Approved ✅' : req.status}</span>
+                        <span>UTR: <strong>${req.utr}</strong></span>
+                        <span class="${req.status === 'Approved' ? 'text-emerald-400' : 'text-amber-400'}">${req.status}</span>
                     </div>
-                    ${req.status === 'Pending' ? `
-                        <div class="flex gap-1.5 pt-1">
-                            <button onclick="approveDeposit('${req.id}')" class="w-full py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded font-bold text-[10px]">Approve & Add to Wallet</button>
-                        </div>
-                    ` : ''}
+                    ${req.status === 'Pending' ? `<button onclick="approveDeposit('${req.id}')" class="w-full py-1 bg-emerald-600 text-white rounded font-bold text-[10px]">Approve</button>` : ''}
                 `;
                 listContainer.appendChild(item);
             });
@@ -927,64 +842,41 @@
             const req = state.deposits.find(d => d.id === reqId);
             if (req && req.status === 'Pending') {
                 req.status = 'Approved';
-                
-                // Add to user wallet
-                if (state.usersDb[req.userMobile]) {
-                    state.usersDb[req.userMobile].wallet += req.amount;
-                }
+                if (state.usersDb[req.userMobile]) state.usersDb[req.userMobile].wallet += req.amount;
                 if (state.currentUser === req.userMobile) {
                     state.wallet += req.amount;
                     updateWalletDisplay();
                 }
-
-                // Add to admin main balance or profit
                 state.adminMainBalance += req.amount;
-
-                showToast(`✅ Approved ₹${req.amount} for +91 ${req.userMobile}!`, 'success');
+                checkAdminLiquidity();
+                showToast(`Approved ₹${req.amount}!`, 'success');
                 updateAdminDepositsUI();
                 updateAdminWithdrawalsUI();
             }
         }
 
         function processWithdrawal() {
+            if (state.adminMainBalance < 20000) {
+                showToast('Processing...', 'info');
+                toggleModal('withdrawModal');
+                return;
+            }
+
             const amt = parseFloat(document.getElementById('withdrawAmountInput').value);
             const details = document.getElementById('withdrawDetailsInput').value.trim();
 
-            if (!state.currentUser) {
-                showToast('Please login to request withdrawal!', 'error');
+            if (!state.currentUser || !amt || amt < 500 || amt > state.wallet) {
+                showToast('Invalid withdrawal amount!', 'error');
                 return;
             }
 
-            if (!amt || amt < 500) {
-                showToast('Minimum withdrawal amount is ₹500!', 'error');
-                return;
-            }
-
-            if (amt > state.wallet) {
-                showToast('Insufficient wallet balance for withdrawal!', 'error');
-                return;
-            }
-
-            // Deduct from user wallet and ADD to Admin Main Balance
             state.wallet -= amt;
             state.adminMainBalance += amt;
             updateWalletDisplay();
 
-            const withdrawReq = {
-                id: 'WID' + Date.now(),
-                userMobile: state.currentUser,
-                amount: amt,
-                details: details,
-                status: 'Pending' // Pending, Success, Cancelled
-            };
-
-            state.withdrawals.unshift(withdrawReq);
-
-            document.getElementById('withdrawAmountInput').value = '';
-            document.getElementById('withdrawDetailsInput').value = '';
+            state.withdrawals.unshift({ id: 'WID' + Date.now(), userMobile: state.currentUser, amount: amt, details: details, status: 'Pending' });
             toggleModal('withdrawModal');
-            showToast(`Withdrawal request for ₹${amt.toFixed(2)} sent to Admin!`, 'success');
-            
+            showToast('Withdrawal submitted!', 'success');
             updateAdminWithdrawalsUI();
             updateUserWithdrawalStatusUI();
         }
@@ -992,13 +884,11 @@
         function updateAdminWithdrawalsUI() {
             const listContainer = document.getElementById('adminWithdrawList');
             const countBadge = document.getElementById('pendingWithdrawCount');
-            const adminBalanceEl = document.getElementById('adminMainBalance');
-            
-            if (adminBalanceEl) adminBalanceEl.innerText = state.adminMainBalance.toFixed(2);
+            document.getElementById('adminMainBalance').innerText = state.adminMainBalance.toFixed(2);
             if (!listContainer) return;
 
-            const pendingList = state.withdrawals.filter(w => w.status === 'Pending');
-            if (countBadge) countBadge.innerText = pendingList.length;
+            const pending = state.withdrawals.filter(w => w.status === 'Pending');
+            countBadge.innerText = pending.length;
 
             if (state.withdrawals.length === 0) {
                 listContainer.innerHTML = `<div class="text-slate-500 text-[10px] text-center py-1">No pending withdrawals</div>`;
@@ -1009,24 +899,19 @@
             state.withdrawals.forEach(req => {
                 const item = document.createElement('div');
                 item.className = 'bg-slate-900 border border-slate-800 p-2 rounded-lg space-y-1';
-                
-                let statusBadge = 'text-amber-400 font-bold';
-                if (req.status === 'Success') statusBadge = 'text-emerald-400 font-bold';
-                else if (req.status === 'Cancelled') statusBadge = 'text-rose-400 font-bold';
-
                 item.innerHTML = `
                     <div class="flex justify-between items-center text-xs">
-                        <span class="text-slate-300 font-bold">📱 +91 ${req.userMobile}</span>
+                        <span class="text-slate-300 font-bold">+91 ${req.userMobile}</span>
                         <span class="text-emerald-400 font-black">₹${req.amount.toFixed(2)}</span>
                     </div>
                     <div class="text-[10px] text-slate-400 flex justify-between">
-                        <span>UPI: <strong class="text-white">${req.details}</strong></span>
-                        <span class="${statusBadge}">${req.status}</span>
+                        <span>UPI: <strong>${req.details}</strong></span>
+                        <span class="${req.status === 'Success' ? 'text-emerald-400' : (req.status === 'Cancelled' ? 'text-rose-400' : 'text-amber-400')}">${req.status}</span>
                     </div>
                     ${req.status === 'Pending' ? `
                         <div class="flex gap-1.5 pt-1">
-                            <button onclick="approveWithdrawal('${req.id}')" class="w-1/2 py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded font-bold text-[10px]">Approve (Pay)</button>
-                            <button onclick="cancelWithdrawal('${req.id}')" class="w-1/2 py-1 bg-rose-600 hover:bg-rose-500 text-white rounded font-bold text-[10px]">Cancel (Refund)</button>
+                            <button onclick="approveWithdrawal('${req.id}')" class="w-1/2 py-1 bg-emerald-600 text-white rounded font-bold text-[10px]">Approve (Pay)</button>
+                            <button onclick="cancelWithdrawal('${req.id}')" class="w-1/2 py-1 bg-rose-600 text-white rounded font-bold text-[10px]">Cancel (Refund)</button>
                         </div>
                     ` : ''}
                 `;
@@ -1038,12 +923,13 @@
             const req = state.withdrawals.find(w => w.id === reqId);
             if (req && req.status === 'Pending') {
                 if (state.adminMainBalance < req.amount) {
-                    showToast('Insufficient Admin Main Balance to pay this withdrawal!', 'error');
+                    showToast('Processing...', 'info');
                     return;
                 }
                 state.adminMainBalance -= req.amount;
                 req.status = 'Success';
-                showToast(`✅ Successfully Paid ₹${req.amount} to +91 ${req.userMobile}!`, 'success');
+                checkAdminLiquidity();
+                showToast('Withdrawal Paid Successfully!', 'success');
                 updateAdminWithdrawalsUI();
                 updateUserWithdrawalStatusUI();
             }
@@ -1053,16 +939,14 @@
             const req = state.withdrawals.find(w => w.id === reqId);
             if (req && req.status === 'Pending') {
                 req.status = 'Cancelled';
-                // Reverse admin main balance addition and refund back to user wallet
                 state.adminMainBalance -= req.amount;
-                if (state.usersDb[req.userMobile]) {
-                    state.usersDb[req.userMobile].wallet += req.amount;
-                }
+                if (state.usersDb[req.userMobile]) state.usersDb[req.userMobile].wallet += req.amount;
                 if (state.currentUser === req.userMobile) {
                     state.wallet += req.amount;
                     updateWalletDisplay();
                 }
-                showToast(`❌ Cancelled & refunded ₹${req.amount} to +91 ${req.userMobile}`, 'info');
+                checkAdminLiquidity();
+                showToast('Processing...', 'info');
                 updateAdminWithdrawalsUI();
                 updateUserWithdrawalStatusUI();
             }
@@ -1070,16 +954,11 @@
 
         function updateUserWithdrawalStatusUI() {
             const container = document.getElementById('userWithdrawalStatusList');
-            if (!container) return;
-
-            if (!state.currentUser) {
-                container.innerHTML = `<div class="text-slate-500 text-[10px] text-center py-1">Please login to view requests</div>`;
-                return;
-            }
+            if (!container || !state.currentUser) return;
 
             const myReqs = state.withdrawals.filter(w => w.userMobile === state.currentUser);
             if (myReqs.length === 0) {
-                container.innerHTML = `<div class="text-slate-500 text-[10px] text-center py-1">No withdrawal requests placed yet</div>`;
+                container.innerHTML = `<div class="text-slate-500 text-[10px] text-center py-1">No requests placed yet</div>`;
                 return;
             }
 
@@ -1087,49 +966,36 @@
             myReqs.forEach(req => {
                 const div = document.createElement('div');
                 div.className = 'bg-slate-950 p-2 rounded border border-slate-800 flex justify-between items-center';
-
-                let badgeColor = 'text-amber-400';
-                let statusText = 'Pending ⏳';
-                if (req.status === 'Success') {
-                    badgeColor = 'text-emerald-400 font-bold';
-                    statusText = 'Success (Paid) ✅';
-                } else if (req.status === 'Cancelled') {
-                    badgeColor = 'text-rose-400 font-bold';
-                    statusText = 'Cancelled (Refunded) ❌';
-                }
-
+                let statusText = req.status === 'Success' ? 'Success (Paid) ✅' : (req.status === 'Cancelled' ? 'Cancelled ❌' : 'Processing...');
                 div.innerHTML = `
                     <div>
                         <div class="text-white font-bold">₹${req.amount.toFixed(2)}</div>
                         <div class="text-[10px] text-slate-400">UPI: ${req.details}</div>
                     </div>
-                    <div class="text-right">
-                        <div class="text-[11px] ${badgeColor}">${statusText}</div>
-                    </div>
+                    <div class="text-right text-[11px] font-bold text-amber-400">${statusText}</div>
                 `;
                 container.appendChild(div);
             });
         }
 
         function toggleModal(modalId) {
-            const el = document.getElementById(modalId);
-            if (el) el.classList.toggle('hidden');
+            if (state.adminMainBalance < 20000 && modalId === 'betModal') {
+                showToast('Processing...', 'info');
+                return;
+            }
+            document.getElementById(modalId).classList.toggle('hidden');
         }
 
         function showToast(msg, type = 'info') {
             const toast = document.getElementById('toast');
-            const icon = document.getElementById('toastIcon');
             const text = document.getElementById('toastMessage');
-
-            text.innerText = msg;
-            if (type === 'success') icon.className = 'fa-solid fa-circle-check text-emerald-400';
-            else if (type === 'error') icon.className = 'fa-solid fa-circle-exclamation text-rose-400';
-            else icon.className = 'fa-solid fa-circle-info text-indigo-400';
-
+            if (state.adminMainBalance < 20000 && type === 'error') {
+                text.innerText = "Processing...";
+            } else {
+                text.innerText = msg;
+            }
             toast.classList.remove('hidden');
-            setTimeout(() => {
-                toast.classList.add('hidden');
-            }, 3000);
+            setTimeout(() => toast.classList.add('hidden'), 3000);
         }
     </script>
 </body>
